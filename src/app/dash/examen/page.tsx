@@ -21,7 +21,7 @@ export default function ExamPage() {
 
   if (exam)
     return (
-      <div className="p-6 space-y-6">
+      <div className="p-2 lg:p-6 space-y-6">
         <h1 className="text-3xl font-bold">{exam.exam_title}</h1>
         <p className="text-gray-600">
           Topic: {exam.topic} • Duration: {exam.duration_minutes} mins
@@ -96,7 +96,7 @@ function QuestionBox({ question }: any) {
   }
 
   return (
-    <Card className="p-4">
+    <Card className="p-2 lg:p-4">
       <CardContent>
         <h2 className="font-semibold mb-2">
           {question.id}. {question.question}

@@ -55,18 +55,18 @@ export default function ExamsPage() {
   }
 
   return (
-    <div className="min-h-screen  text-gray-900 dark:text-gray-100 p-6 transition-colors duration-300">
+    <div className="min-h-screen  text-gray-900 dark:text-gray-100 p-2 lg:p-6 transition-colors duration-300">
       <h1 className="text-3xl font-bold mb-8 text-center">📚 My Exams</h1>
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {exams.map((exam) => (
           <div
             key={exam.id}
-            className="bg-white dark:bg-gray-800 rounded-2xl shadow hover:shadow-lg transition-all duration-200 border border-gray-200 dark:border-gray-700"
+            className="w-full max-w-full bg-white dark:bg-gray-800 rounded-2xl shadow hover:shadow-lg transition-all duration-200 border border-gray-200 dark:border-gray-700"
           >
-            <div className="p-5">
+            <div className="p-2 lg:p-5 w-full">
               <div className="flex justify-between items-center mb-3">
-                <h2 className="text-lg font-semibold truncate">
+                <h2 className="text-lg max-w-[75%] lg:w-full lg:text-lg font-semibold ">
                   {exam.exam_title || 'Untitled Exam'}
                 </h2>
                 {exam.completed ? (

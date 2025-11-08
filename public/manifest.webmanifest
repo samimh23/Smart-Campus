@@ -1,0 +1,33 @@
+{
+  "name": "Smart Campus",
+  "short_name": "Smart Campus",
+  "start_url": "/dash",
+  "scope": "/",
+  "description": "Task management and learning app",
+  "orientation": "portrait",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0d6efd",
+  "screenshots": [
+    {
+     "src": "/ai.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Wonder Widgets"
+    },
+    {
+     "src": "/ai.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "label": "Wonder Widgets"
+    }
+],
+  "icons": [
+    {
+      "src": "/ai.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

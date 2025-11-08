@@ -26,7 +26,7 @@ export default function AuthPage() {
 
     try {
       const response = await axios.post(
-        'http://localhost:3000/auth/login',
+        'http://localhost:5000/auth/login',
         loginForm,
         { withCredentials: true } // pour accepter les cookies httpOnly
       )
@@ -35,9 +35,11 @@ export default function AuthPage() {
 
       // Stocker le token JWT pour les appels futurs
       localStorage.setItem('token', response.data.token)
+      localStorage.setItem('role', response.data.user.role?.toUpperCase())
+
 
       // Naviguer vers la page home
-      router.push('/home')
+      router.push('/dash')
     } catch (error: any) {
       console.error('Login failed:', error.response?.data || error.message)
       alert(error.response?.data?.message || 'Login failed')

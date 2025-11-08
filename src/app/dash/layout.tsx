@@ -29,6 +29,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       setDarkMode(true)
       document.documentElement.classList.add('dark')
     }
+
+    const token = localStorage.getItem('token')
+    const role = localStorage.getItem('role')
+
+    if (!token || role !== 'STUDENT') {
+      router.push('/auth') // redirect to login if not student
+    }
   }, [])
 
   // Toggle dark mode
@@ -52,8 +59,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: 'Home', icon: Home, path: '/dash' },
     { name: 'Quiz', icon: User, path: '/dash/quiz' },
     { name: 'Add Quiz', icon: Calendar, path: '/dash/add-quizz' },
-    { name: 'AI Summary', icon: Brain, path: '/dash/ai-summary' },
-    { name: 'Courses', icon: BookOpen, path: '/dash/courses' },
+    { name: 'Add Exam', icon: Brain, path: '/dash/examen' },
+    { name: 'Exams', icon: BookOpen, path: '/dash/exams' },
     // { name: 'Store', icon: ShoppingBag, path: '/dash/store' },
   ]
 
@@ -127,7 +134,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
 
         {/* Page Content */}
-        <div className="flex-1 p-4 md:p-8 animate-fade-in">{children}</div>
+        <div className="flex-1 p-4 md:p-8 pb-16 lg:pb-8">{children}</div>
 
         {/* Bottom navigation (Mobile) */}
         <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-900/80 backdrop-blur-md border-t border-slate-200 dark:border-slate-700 flex justify-around py-2">
