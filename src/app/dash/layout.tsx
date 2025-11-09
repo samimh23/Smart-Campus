@@ -61,6 +61,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: 'Add Quiz', icon: Calendar, path: '/dash/add-quizz' },
     { name: 'Add Exam', icon: Brain, path: '/dash/examen' },
     { name: 'Exams', icon: BookOpen, path: '/dash/exams' },
+    { name: 'Explain', icon: GraduationCap, path: '/dash/explain' },
     // { name: 'Store', icon: ShoppingBag, path: '/dash/store' },
   ]
 

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline Mode</title>
+  <style>
+    /* Reset and layout */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, #1a1a2e, #16213e);
+      font-family: "Poppins", sans-serif;
+      color: #fff;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      background: linear-gradient(90deg, #00dbde, #fc00ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: glow 3s ease-in-out infinite alternate;
+    }
+
+    p {
+      font-size: 1.1rem;
+      color: #cfd9df;
+      margin-bottom: 2rem;
+    }
+
+    @keyframes glow {
+      from {
+        text-shadow: 0 0 5px rgba(0, 219, 222, 0.3),
+                     0 0 10px rgba(252, 0, 255, 0.2);
+      }
+      to {
+        text-shadow: 0 0 20px rgba(0, 219, 222, 0.7),
+                     0 0 40px rgba(252, 0, 255, 0.5);
+      }
+    }
+
+    .wifi-icon {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .wifi-icon::before,
+    .wifi-icon::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      border-radius: 50%;
+      transform: translateX(-50%);
+    }
+
+    .wifi-icon::before {
+      bottom: 0;
+      width: 20px;
+      height: 20px;
+      background-color: #00dbde;
+    }
+
+    .wifi-icon::after {
+      bottom: 20px;
+      width: 60px;
+      height: 60px;
+      border: 5px solid #00dbde;
+      border-color: #00dbde transparent transparent transparent;
+      border-radius: 50%;
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; transform: translateX(-50%) scale(1); }
+      100% { opacity: 0; transform: translateX(-50%) scale(1.5); }
+    }
+
+    .btn {
+      background: linear-gradient(90deg, #00dbde, #fc00ff);
+      border: none;
+      border-radius: 50px;
+      padding: 12px 30px;
+      font-size: 1rem;
+      font-weight: 500;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(252, 0, 255, 0.3);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 20px rgba(0, 219, 222, 0.6);
+    }
+  </style>
+</head>
+<body>
+  <div class="wifi-icon"></div>
+  <h1>You are offline</h1>
+  <p>Please check your internet connection.</p>
+  <button class="btn" onclick="location.reload()">Try Again</button>
+</body>
+</html>
