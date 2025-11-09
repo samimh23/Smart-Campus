@@ -12,6 +12,8 @@ import {
   BookOpen,
   Moon,
   Sun,
+  Sparkles,
+  TrendingUp,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import clsx from 'clsx'
@@ -61,6 +63,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: 'Add Quiz', icon: Calendar, path: '/dash/add-quizz' },
     { name: 'Add Exam', icon: Brain, path: '/dash/examen' },
     { name: 'Exams', icon: BookOpen, path: '/dash/exams' },
+    { name: 'AI Tutor', icon: Sparkles, path: '/dash/tutor' },
+    { name: 'Progress', icon: TrendingUp, path: '/dash/progress' },
     // { name: 'Store', icon: ShoppingBag, path: '/dash/store' },
   ]
 
