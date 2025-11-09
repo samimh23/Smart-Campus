@@ -26,7 +26,7 @@ export default function AuthPage() {
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/auth/login',
+        'http://localhost:3000/auth/login',
         loginForm,
         { withCredentials: true } // pour accepter les cookies httpOnly
       )
