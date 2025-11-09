@@ -4,13 +4,18 @@ import { useState, useEffect } from 'react'
 import { useRouter, useParams, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { ArrowLeft, BookOpen, Download, Calendar, User, FileText, Loader2, AlertCircle } from 'lucide-react'
+import { ArrowLeft, BookOpen, Download, Calendar, User, FileText, Loader2, AlertCircle, Tag } from 'lucide-react'
 
 interface Course {
   id: number
   title: string
   description?: string
   filePath?: string
+  subject?: string
+  subjectRelation?: {
+    id: number
+    name: string
+  }
   teacher: {
     id: number
     first_name: string
@@ -65,6 +70,7 @@ export default function CourseDetailsPage() {
       }
       
       const data = await response.json()
+      console.log('📚 Course details loaded:', data) // Debug log
       setCourse(data)
       
     } catch (error) {
@@ -89,6 +95,12 @@ export default function CourseDetailsPage() {
     } else {
       router.push('/teacher/classes')
     }
+  }
+
+  // Helper function to get subject name
+  const getSubjectName = (): string => {
+    if (!course) return 'Non spécifiée'
+    return course.subjectRelation?.name || course.subject || 'Non spécifiée'
   }
 
   if (isLoading) {
@@ -149,7 +161,15 @@ export default function CourseDetailsPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-white">{course.title}</h1>
-              <p className="text-slate-400 mt-2">Détails du cours</p>
+              <div className="flex items-center gap-4 mt-2">
+                <p className="text-slate-400">Détails du cours</p>
+                <div className="flex items-center gap-2 px-3 py-1 bg-[#a855f7]/20 rounded-full">
+                  <Tag className="h-3 w-3 text-[#a855f7]" />
+                  <span className="text-[#a855f7] text-sm font-medium">
+                    {getSubjectName()}
+                  </span>
+                </div>
+              </div>
             </div>
             
             {course.filePath && (
@@ -217,6 +237,40 @@ export default function CourseDetailsPage() {
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Course Info */}
+            <Card className="bg-[#1a1f2e] border-slate-800">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Calendar className="h-5 w-5" />
+                  Informations du cours
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-sm text-slate-400">ID du cours</p>
+                    <p className="text-white font-medium">{course.id}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-slate-400">Matière</p>
+                    <p className="text-white font-medium">{getSubjectName()}</p>
+                  </div>
+                  {course.createdAt && (
+                    <div>
+                      <p className="text-sm text-slate-400">Créé le</p>
+                      <p className="text-white font-medium">
+                        {new Date(course.createdAt).toLocaleDateString('fr-FR', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Teacher Info */}
             <Card className="bg-[#1a1f2e] border-slate-800">
               <CardHeader>
@@ -228,45 +282,67 @@ export default function CourseDetailsPage() {
               <CardContent>
                 <div className="space-y-3">
                   <div>
-                    <p className="text-sm text-slate-400">Nom</p>
+                    <p className="text-sm text-slate-400">Nom complet</p>
                     <p className="text-white font-medium">
                       {course.teacher.first_name} {course.teacher.last_name}
                     </p>
                   </div>
                   <div>
                     <p className="text-sm text-slate-400">Email</p>
-                    <p className="text-white font-medium">{course.teacher.email}</p>
+                    <p className="text-white font-medium break-all">{course.teacher.email}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Course Info */}
+            {/* Quick Actions */}
             <Card className="bg-[#1a1f2e] border-slate-800">
               <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
-                  <Calendar className="h-5 w-5" />
-                  Informations
+                <CardTitle className="text-white text-lg">
+                  Actions rapides
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-sm text-slate-400">ID du cours</p>
-                    <p className="text-white font-medium">{course.id}</p>
-                  </div>
-                  {course.createdAt && (
-                    <div>
-                      <p className="text-sm text-slate-400">Créé le</p>
-                      <p className="text-white font-medium">
-                        {new Date(course.createdAt).toLocaleDateString('fr-FR')}
-                      </p>
-                    </div>
+                <div className="space-y-2">
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start border-slate-700 text-slate-300 hover:bg-white/10"
+                    onClick={handleBackToCourses}
+                  >
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Retour à la liste
+                  </Button>
+                  {course.filePath && (
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start border-slate-700 text-slate-300 hover:bg-white/10"
+                      onClick={handleDownloadFile}
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Télécharger le fichier
+                    </Button>
                   )}
                 </div>
               </CardContent>
             </Card>
           </div>
+        </div>
+
+        {/* Subject Badge for Mobile */}
+        <div className="lg:hidden mt-6">
+          <Card className="bg-[#1a1f2e] border-slate-800">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Tag className="h-4 w-4 text-[#a855f7]" />
+                  <span className="text-slate-400">Matière:</span>
+                </div>
+                <span className="text-[#a855f7] font-medium">
+                  {getSubjectName()}
+                </span>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

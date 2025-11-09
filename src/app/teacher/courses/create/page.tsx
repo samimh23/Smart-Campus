@@ -1,87 +1,223 @@
+// app/teacher/courses/create/page.tsx
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ArrowLeft, Upload, Loader2, AlertCircle } from 'lucide-react'
+
+interface Subject {
+  id: number
+  name: string
+}
+
+interface FileData {
+  filename: string
+  path: string
+  originalFileName: string
+  fileSize: number
+  fileType: string
+}
 
 export default function CreateCoursePage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const classId = searchParams.get('class')
   
+  const [isLoading, setIsLoading] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [subjects, setSubjects] = useState<Subject[]>([])
+  const [className, setClassName] = useState<string>('')
+  const [subjectsLoading, setSubjectsLoading] = useState(true)
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
+    subject_id: '',
+    file: null as File | null,
   })
-  const [file, setFile] = useState<File | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
+  const [uploadedFile, setUploadedFile] = useState<FileData | null>(null)
+
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    const role = localStorage.getItem('role')
+
+    if (!token || role !== 'TEACHER') {
+      router.push('/')
+      return
+    }
+
+    if (classId) {
+      loadSubjects()
+      loadClassName()
+    } else {
+      setError('ID de classe manquant')
+    }
+  }, [classId, router])
+
+  const loadSubjects = async () => {
+    try {
+      setSubjectsLoading(true)
+      const token = localStorage.getItem('token')
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
+      
+      console.log('🔄 Loading subjects from:', `${API_URL}/courses/subjects/all`)
+      
+      const response = await fetch(`${API_URL}/courses/subjects/all`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      })
+      
+      console.log('📡 Subjects response status:', response.status)
+      
+      if (response.ok) {
+        const subjectsData = await response.json()
+        console.log('✅ Subjects loaded:', subjectsData)
+        setSubjects(subjectsData)
+      } else {
+        console.error('❌ Failed to load subjects:', response.status, response.statusText)
+        setError('Erreur lors du chargement des matières')
+        
+        // Fallback: Try the general subjects endpoint
+        try {
+          const fallbackResponse = await fetch(`${API_URL}/subjects`, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          })
+          if (fallbackResponse.ok) {
+            const fallbackData = await fallbackResponse.json()
+            console.log('✅ Subjects loaded from fallback:', fallbackData)
+            setSubjects(fallbackData)
+          }
+        } catch (fallbackError) {
+          console.error('❌ Fallback also failed:', fallbackError)
+        }
+      }
+    } catch (error) {
+      console.error('❌ Error loading subjects:', error)
+      setError('Erreur lors du chargement des matières')
+    } finally {
+      setSubjectsLoading(false)
+    }
+  }
+
+  const loadClassName = async () => {
+    try {
+      const token = localStorage.getItem('token')
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
+      
+      const response = await fetch(`${API_URL}/classes/${classId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      })
+      
+      if (response.ok) {
+        const classData = await response.json()
+        setClassName(classData.name)
+      }
+    } catch (error) {
+      console.error('Error loading class name:', error)
+    }
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0])
+    const file = e.target.files?.[0]
+    if (file) {
+      setFormData(prev => ({ ...prev, file }))
+      setUploadedFile(null) // Reset uploaded file when new file is selected
+    }
+  }
+
+  const uploadFile = async (file: File): Promise<FileData> => {
+    setIsUploading(true)
+    try {
+      const token = localStorage.getItem('token')
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
+      
+      const formDataToSend = new FormData()
+      formDataToSend.append('file', file)
+
+      const response = await fetch(`${API_URL}/courses/upload`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formDataToSend
+      })
+
+      if (!response.ok) {
+        throw new Error('Erreur lors du téléchargement du fichier')
+      }
+
+      const result = await response.json()
+      return result
+    } catch (error) {
+      console.error('Error uploading file:', error)
+      throw error
+    } finally {
+      setIsUploading(false)
     }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+    setError(null)
+
     if (!formData.title.trim()) {
-      setError('Le titre est obligatoire')
+      setError('Le titre est requis')
       return
     }
 
+    if (!formData.subject_id) {
+      setError('Veuillez sélectionner une matière')
+      return
+    }
+
+    setIsLoading(true)
+
     try {
-      setIsLoading(true)
-      setError(null)
-      
       const token = localStorage.getItem('token')
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
 
-      let filePath = null
-
+      let fileData: FileData | null = null
+      
       // Upload file if exists
-      if (file) {
-        const formDataFile = new FormData()
-        formDataFile.append('file', file)
-
-        const uploadResponse = await fetch(`${API_URL}/courses/upload`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-          body: formDataFile
-        })
-
-        if (!uploadResponse.ok) {
-          throw new Error('Erreur lors du téléchargement du fichier')
-        }
-
-        const uploadData = await uploadResponse.json()
-        filePath = uploadData.path
+      if (formData.file) {
+        fileData = await uploadFile(formData.file)
+        setUploadedFile(fileData)
       }
 
-      // Create course - using the existing backend structure
-      const courseData = {
+      // Create course data object
+      const courseData: any = {
         title: formData.title,
         description: formData.description,
-        filePath: filePath
-        // Note: classId is not included since your backend doesn't support it yet
+        subject_id: parseInt(formData.subject_id),
+        classIds: classId ? [parseInt(classId)] : [],
       }
 
-      const courseResponse = await fetch(`${API_URL}/courses`, {
+      // Add file data if uploaded
+      if (fileData) {
+        courseData.filePath = fileData.path
+        courseData.originalFileName = fileData.originalFileName
+        courseData.fileSize = fileData.fileSize
+        courseData.fileType = fileData.fileType
+      }
+
+      console.log('📤 Creating course with data:', courseData)
+
+      const response = await fetch(`${API_URL}/courses`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -90,20 +226,17 @@ export default function CreateCoursePage() {
         body: JSON.stringify(courseData)
       })
 
-      if (!courseResponse.ok) {
-        throw new Error('Erreur lors de la création du cours')
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Erreur lors de la création du cours')
       }
 
-      // Redirect to courses list
-      if (classId) {
-        router.push(`/teacher/courses?class=${classId}`)
-      } else {
-        router.push('/teacher/courses')
-      }
+      // Redirect back to courses list
+      router.push(`/teacher/courses?class=${classId}`)
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating course:', error)
-      setError('Erreur lors de la création du cours')
+      setError(error.message || 'Erreur lors de la création du cours')
     } finally {
       setIsLoading(false)
     }
@@ -116,7 +249,7 @@ export default function CreateCoursePage() {
         <div className="mb-6">
           <Button
             variant="outline"
-            onClick={() => router.push(classId ? `/teacher/courses?class=${classId}` : '/teacher/courses')}
+            onClick={() => router.push(`/teacher/courses?class=${classId}`)}
             className="flex items-center gap-2 mb-4 border-slate-700 text-slate-300 hover:bg-white/10"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -124,8 +257,10 @@ export default function CreateCoursePage() {
           </Button>
           
           <div>
-            <h1 className="text-3xl font-bold text-white">Créer un nouveau cours</h1>
-            <p className="text-slate-400 mt-2">Ajoutez un nouveau cours à cette classe</p>
+            <h1 className="text-3xl font-bold text-white">
+              Créer un nouveau cours {className && `pour ${className}`}
+            </h1>
+            <p className="text-slate-400 mt-2">Remplissez les informations du cours</p>
           </div>
         </div>
 
@@ -140,65 +275,100 @@ export default function CreateCoursePage() {
 
         {/* Create Course Form */}
         <Card className="bg-[#1a1f2e] border-slate-800">
-          <CardHeader>
-            <CardTitle className="text-white">Informations du cours</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+          <CardContent className="p-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               {/* Title */}
-              <div>
-                <label className="text-white text-sm font-medium mb-2 block">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-white">
                   Titre du cours *
                 </label>
                 <Input
                   type="text"
-                  name="title"
                   value={formData.title}
-                  onChange={handleInputChange}
-                  placeholder="Entrez le titre du cours"
-                  className="bg-[#0a0e1a] border-slate-700 text-white"
+                  onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                  placeholder="Ex: Introduction aux algorithmes"
+                  className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-500"
                   required
                 />
               </div>
 
               {/* Description */}
-              <div>
-                <label className="text-white text-sm font-medium mb-2 block">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-white">
                   Description
                 </label>
                 <Textarea
-                  name="description"
                   value={formData.description}
-                  onChange={handleInputChange}
-                  placeholder="Description du cours (optionnel)"
-                  className="bg-[#0a0e1a] border-slate-700 text-white min-h-[100px]"
-                  rows={4}
+                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Décrivez le contenu de ce cours..."
+                  className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-500 min-h-[100px]"
                 />
               </div>
 
+              {/* Subject Selection */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-white">
+                  Matière *
+                </label>
+                {subjectsLoading ? (
+                  <div className="flex items-center gap-2 text-slate-400">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Chargement des matières...
+                  </div>
+                ) : (
+                  <Select 
+                    value={formData.subject_id} 
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, subject_id: value }))}
+                  >
+                    <SelectTrigger className="bg-slate-900 border-slate-700 text-white">
+                      <SelectValue placeholder="Sélectionnez une matière" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-900 border-slate-700 text-white">
+                      {subjects.length > 0 ? (
+                        subjects.map((subject) => (
+                          <SelectItem key={subject.id} value={subject.id.toString()}>
+                            {subject.name}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="" disabled>
+                          Aucune matière disponible
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                )}
+              </div>
+
               {/* File Upload */}
-              <div>
-                <label className="text-white text-sm font-medium mb-2 block">
-                  Fichier du cours
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-white">
+                  Fichier du cours (PDF, Word, PowerPoint)
                 </label>
                 <div className="border-2 border-dashed border-slate-700 rounded-lg p-6 text-center hover:border-[#a855f7] transition-colors">
                   <Input
                     type="file"
                     onChange={handleFileChange}
+                    accept=".pdf,.doc,.docx,.ppt,.pptx,.txt"
                     className="hidden"
                     id="file-upload"
-                    accept=".pdf,.doc,.docx,.ppt,.pptx,.txt"
                   />
                   <label htmlFor="file-upload" className="cursor-pointer">
                     <Upload className="h-8 w-8 text-[#a855f7] mx-auto mb-2" />
                     <p className="text-white font-medium">
-                      {file ? file.name : 'Cliquez pour télécharger un fichier'}
+                      {formData.file ? formData.file.name : 'Cliquez pour sélectionner un fichier'}
                     </p>
                     <p className="text-slate-400 text-sm mt-1">
-                      PDF, Word, PowerPoint, ou texte (max 10MB)
+                      PDF, Word, PowerPoint, ou fichier texte
                     </p>
                   </label>
                 </div>
+                {formData.file && (
+                  <p className="text-green-400 text-sm">
+                    ✓ Fichier sélectionné: {formData.file.name}
+                    {uploadedFile && ' (Téléchargé)'}
+                  </p>
+                )}
               </div>
 
               {/* Submit Button */}
@@ -206,20 +376,21 @@ export default function CreateCoursePage() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => router.push(classId ? `/teacher/courses?class=${classId}` : '/teacher/courses')}
+                  onClick={() => router.push(`/teacher/courses?class=${classId}`)}
                   className="flex-1 border-slate-700 text-slate-300 hover:bg-white/10"
+                  disabled={isLoading}
                 >
                   Annuler
                 </Button>
                 <Button
                   type="submit"
-                  disabled={isLoading}
                   className="flex-1 bg-[#a855f7] hover:bg-[#a855f7]/90"
+                  disabled={isLoading || isUploading || subjectsLoading}
                 >
-                  {isLoading ? (
+                  {(isLoading || isUploading) ? (
                     <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Création...
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      {isUploading ? 'Téléchargement...' : 'Création...'}
                     </>
                   ) : (
                     'Créer le cours'

@@ -1,3 +1,4 @@
+// app/teacher/courses/page.tsx
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -11,6 +12,11 @@ interface Course {
   title: string
   description?: string
   filePath?: string
+  subject?: string
+  subjectRelation?: {
+    id: number
+    name: string
+  }
   teacher: {
     id: number
     first_name: string
@@ -76,7 +82,6 @@ export default function TeacherCoursesPage() {
       const token = localStorage.getItem('token')
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
       
-      // Use the general courses endpoint since class relationship might not be set up
       const response = await fetch(`${API_URL}/courses`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -89,10 +94,7 @@ export default function TeacherCoursesPage() {
       }
       
       const coursesData = await response.json()
-      
-      // For now, show all courses since we don't have class filtering in the backend
-      // Once class relationship is set up, we can filter here:
-      // const filteredCourses = coursesData.filter((course: Course) => course.classes?.some(cl => cl.id === parseInt(classId!)))
+      console.log('📚 Courses loaded:', coursesData) // Debug log
       
       setCourses(coursesData)
       
@@ -146,6 +148,11 @@ export default function TeacherCoursesPage() {
 
   const handleCreateCourse = () => {
     router.push(`/teacher/courses/create?class=${classId}`)
+  }
+
+  // Helper function to get subject name
+  const getSubjectName = (course: Course): string => {
+    return course.subjectRelation?.name || course.subject || 'Non spécifiée'
   }
 
   return (
@@ -234,6 +241,12 @@ export default function TeacherCoursesPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-slate-400">Matière:</span>
+                      <span className="text-white font-medium">
+                        {getSubjectName(course)}
+                      </span>
+                    </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-slate-400">Fichier:</span>
                       <span className="text-white font-medium">
