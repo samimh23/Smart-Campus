@@ -5,7 +5,11 @@ const CACHE = "ai-tutor-cache-v1";
 const ASSETS = [
   "/dash/quiz",           // quiz page
   "/dash/exams",           // exam page
-  "/dash"
+  "/dash",
+  "/dash/explain",
+  "/dash/examen",
+  "/dash/add-quizz",
+  "/auth",
 ];
 
 // Install event - cache static assets
@@ -47,7 +51,9 @@ self.addEventListener("fetch", (event) => {
         // Cache /quiz and /exam responses for offline access
         if (
           url.pathname.startsWith("/quiz") ||
-          url.pathname.startsWith("/exam")
+          url.pathname.startsWith("/exam") ||
+          url.pathname.endsWith('.css') ||
+          url.pathname.endsWith('.js')
         ) {
           const cache = await caches.open(CACHE);
           cache.put(request, response.clone());
