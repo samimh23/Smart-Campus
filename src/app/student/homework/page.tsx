@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Calendar, User, BookOpen, FileText, CheckCircle, Clock, Star, Download, Paperclip } from 'lucide-react'
+import { ArrowLeft, Calendar, User, BookOpen, FileText, CheckCircle, Clock, Star, Download, Paperclip } from 'lucide-react'
 import { Homework, HomeworkSubmission, Grade } from '@/types/homework'
 import { homeworkAPI } from '@/lib/homework-api'
 import { submissionAPI } from '@/lib/submission-api'
@@ -12,6 +13,7 @@ import { SubmissionForm } from '@/components/homework/SubmissionForm'
 import { uploadAPI } from '@/lib/upload-api'
 
 export default function StudentHomeworkPage() {
+  const router = useRouter()
   const [homeworks, setHomeworks] = useState<Homework[]>([])
   const [submissions, setSubmissions] = useState<HomeworkSubmission[]>([])
   const [grades, setGrades] = useState<Grade[]>([])
@@ -26,12 +28,12 @@ export default function StudentHomeworkPage() {
     const role = localStorage.getItem('role')
 
     if (!token || role !== 'STUDENT') {
-      window.location.href = '/'
+      router.push('/')
       return
     }
 
     loadData()
-  }, [])
+  }, [router])
 
   const loadData = async () => {
     try {
@@ -80,6 +82,7 @@ export default function StudentHomeworkPage() {
     return diffInDays
   }
 
+  // Fonctions pour gérer les soumissions
   const getSubmissionForHomework = (homeworkId: number) => {
     return submissions.find(sub => sub.homework_id === homeworkId)
   }
@@ -145,15 +148,26 @@ export default function StudentHomeworkPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="container mx-auto px-4">
+        <div className="mb-6">
+          <Button
+            variant="outline"
+            onClick={() => router.push('/student/dashboard')}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Retour au dashboard
+          </Button>
+        </div>
+
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Devoirs</h1>
           <p className="text-gray-600">Consultez tous les devoirs assignés</p>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+          <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
             {error}
           </div>
         )}
@@ -166,12 +180,16 @@ export default function StudentHomeworkPage() {
                 onClick={handleCancelSubmission}
                 className="flex items-center gap-2"
               >
+                <ArrowLeft className="h-4 w-4" />
                 Retour aux devoirs
               </Button>
             </div>
             <SubmissionForm
               homeworkId={selectedHomework.id}
-              initialData={editingSubmission as any}
+              initialData={editingSubmission ? {
+                content: editingSubmission.content,
+                attachment_url: editingSubmission.attachment_url,
+              } : undefined}
               onSubmit={handleSubmitSubmission}
               onCancel={handleCancelSubmission}
               isEditing={!!editingSubmission}
@@ -352,3 +370,6 @@ export default function StudentHomeworkPage() {
     </div>
   )
 }
+
+
+

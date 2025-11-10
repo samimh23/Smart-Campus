@@ -1,50 +1,40 @@
-"use client"
+'use client'
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import {
-  BookOpen,
-  Users,
-  Calendar,
-  Star,
-  FileText,
-  CheckCircle,
-  AlertCircle,
-  Loader2,
-  ArrowUpRight,
-} from "lucide-react"
-import type { Homework, HomeworkSubmission, Grade } from "@/types/homework"
-import { homeworkAPI } from "@/lib/homework-api"
-import { submissionAPI } from "@/lib/submission-api"
-import { useNotifications } from "@/hooks/use-notifications"
-import { NotificationToast } from "@/components/notifications/NotificationToast"
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { BookOpen, Users, Calendar, LogOut, Plus, Star, FileText, CheckCircle, AlertCircle } from 'lucide-react'
+import { Homework, HomeworkSubmission, Grade } from '@/types/homework'
+import { homeworkAPI } from '@/lib/homework-api'
+import { submissionAPI } from '@/lib/submission-api'
+import { useNotifications } from '@/hooks/use-notifications'
+import { NotificationToast } from '@/components/notifications/NotificationToast'
 
 export default function TeacherDashboard() {
   const router = useRouter()
-  const [email, setEmail] = useState("")
-  const [userId, setUserId] = useState<string>("")
+  const [email, setEmail] = useState('')
+  const [userId, setUserId] = useState<string>('')
   const [recentHomeworks, setRecentHomeworks] = useState<Homework[]>([])
   const [allHomeworks, setAllHomeworks] = useState<Homework[]>([])
   const [allSubmissions, setAllSubmissions] = useState<HomeworkSubmission[]>([])
   const [allGrades, setAllGrades] = useState<Grade[]>([])
   const [isLoading, setIsLoading] = useState(true)
-
+  
   // Notifications
-  const { notifications, removeNotification } = useNotifications(userId, "TEACHER")
+  const { notifications, removeNotification } = useNotifications(userId, 'TEACHER')
 
   useEffect(() => {
-    const token = localStorage.getItem("token")
-    const role = localStorage.getItem("role")
-    const storedUserId = localStorage.getItem("userId")
+    const token = localStorage.getItem('token')
+    const role = localStorage.getItem('role')
+    const storedUserId = localStorage.getItem('userId')
 
-    if (!token || role !== "TEACHER") {
-      router.push("/")
-      return
+    if (!token || role !== 'TEACHER') {
+      router.push('/') // redirect to login if not teacher
     } else {
-      const storedEmail = localStorage.getItem("email")
-      setEmail(storedEmail || "")
-      setUserId(storedUserId || "")
+      const storedEmail = localStorage.getItem('email')
+      setEmail(storedEmail || '')
+      setUserId(storedUserId || '')
       loadDashboardData()
     }
   }, [router])
@@ -53,42 +43,54 @@ export default function TeacherDashboard() {
     try {
       setIsLoading(true)
       const homeworks = await homeworkAPI.getMyHomework()
-      setAllHomeworks(homeworks)
-      setRecentHomeworks(homeworks.slice(0, 3))
-
-      const submissionsPromises = homeworks.map((hw) => submissionAPI.getHomeworkSubmissions(hw.id).catch(() => []))
+      setAllHomeworks(homeworks) // Tous les devoirs pour les statistiques
+      setRecentHomeworks(homeworks.slice(0, 3)) // Afficher les 3 derniers devoirs
+      
+      // Charger les soumissions et notes pour tous les devoirs
+      const submissionsPromises = homeworks.map(hw => 
+        submissionAPI.getHomeworkSubmissions(hw.id).catch(() => [])
+      )
       const allSubmissionsData = await Promise.all(submissionsPromises)
       setAllSubmissions(allSubmissionsData.flat())
-
+      
+      // Charger les notes créées par l'enseignant
       const gradesData = await submissionAPI.getTeacherGrades()
       setAllGrades(gradesData)
     } catch (error) {
-      console.error("Erreur lors du chargement des données:", error)
+      console.error('Erreur lors du chargement des données:', error)
     } finally {
       setIsLoading(false)
     }
   }
 
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('role')
+    localStorage.removeItem('email')
+    router.push('/')
+  }
+
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("fr-FR", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+    return new Date(dateString).toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
     })
   }
 
+  // Statistiques pour l'enseignant
   const getTotalSubmissions = () => {
     return allSubmissions.length
   }
 
   const getSubmittedCount = () => {
-    return allSubmissions.filter((s) => s.is_submitted).length
+    return allSubmissions.filter(s => s.is_submitted).length
   }
 
   const getPendingGradingCount = () => {
-    return allSubmissions.filter((s) => s.is_submitted).length - allGrades.length
+    return allSubmissions.filter(s => s.is_submitted).length - allGrades.length
   }
 
   const getGradedCount = () => {
@@ -101,224 +103,247 @@ export default function TeacherDashboard() {
   }
 
   const getActiveHomeworks = () => {
-    return allHomeworks.filter((h) => h.is_active).length
+    return allHomeworks.filter(h => h.is_active).length
   }
 
   const getUpcomingDeadlines = () => {
-    return allHomeworks.filter((h) => new Date(h.deadline) > new Date()).length
+    return allHomeworks.filter(h => new Date(h.deadline) > new Date()).length
   }
 
   const getOverdueHomeworks = () => {
-    return allHomeworks.filter((h) => new Date(h.deadline) < new Date()).length
+    return allHomeworks.filter(h => new Date(h.deadline) < new Date()).length
   }
 
-  const stats = [
-    {
-      title: "Total Devoirs",
-      value: allHomeworks.length.toString(),
-      change: "+2%",
-      icon: BookOpen,
-      color: "text-[#a855f7]",
-      bgColor: "bg-[#a855f7]/20",
-    },
-    {
-      title: "Soumissions Reçues",
-      value: getTotalSubmissions().toString(),
-      change: "+5%",
-      icon: Users,
-      color: "text-[#FF6B35]",
-      bgColor: "bg-[#FF6B35]/20",
-    },
-    {
-      title: "À Noter",
-      value: getPendingGradingCount().toString(),
-      change: "+1%",
-      icon: Star,
-      color: "text-emerald-400",
-      bgColor: "bg-emerald-500/20",
-    },
-    {
-      title: "Notées",
-      value: getGradedCount().toString(),
-      change: "+3%",
-      icon: CheckCircle,
-      color: "text-emerald-400",
-      bgColor: "bg-emerald-500/20",
-    },
-  ]
-
   return (
-    <>
-      <style jsx>{`
-        .stat-card {
-          transition: all 0.3s ease;
-          background: #1e293b !important;
-          border: 1px solid #334155 !important;
-          position: relative;
-          overflow: hidden;
-        }
-        .stat-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 10px 25px -5px rgba(255, 107, 53, 0.3), 0 8px 10px -6px rgba(249, 115, 22, 0.2);
-          border-color: #FF6B35 !important;
-        }
-        .stat-card::before {
-          content: "";
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: 4px;
-          background: linear-gradient(90deg, #a855f7 0%, #FF6B35 50%, #10b981 100%);
-          opacity: 0;
-          transition: opacity 0.3s ease;
-        }
-        .stat-card:hover::before {
-          opacity: 1;
-        }
-      `}</style>
-
-      {/* Header */}
-      <header className="bg-[#1a1f2e] border-b border-slate-800 sticky top-0 z-10 shadow-lg">
-        <div className="flex items-center justify-between p-6">
-          <div>
-            <h1 className="text-3xl font-bold text-white">Tableau de Bord Enseignant</h1>
-            <p className="text-slate-400 mt-1">Bienvenue, {email || "Enseignant"}!</p>
+    <div className="min-h-screen bg-[#0a0e1a]">
+      <div className="container mx-auto px-4 py-4 sm:px-6 sm:py-6 pb-20 lg:pb-6">
+        {/* Header */}
+        <div className="bg-slate-900/50 backdrop-blur-sm rounded-xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8 border border-slate-800">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+            <div className="flex items-center space-x-3 sm:space-x-4">
+              <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-[#a855f7] to-[#FF6B35] rounded-xl shadow-lg flex-shrink-0">
+                <BookOpen className="h-5 w-5 sm:h-7 sm:w-7 text-white" />
+              </div>
+              <div className="min-w-0">
+                <h1 className="text-xl sm:text-2xl font-bold text-white truncate">Dashboard Enseignant</h1>
+                <p className="text-sm sm:text-base text-slate-400 truncate">Bienvenue, {email || 'Enseignant'}!</p>
+              </div>
+            </div>
+            <Button 
+              onClick={handleLogout} 
+              variant="outline" 
+              size="sm"
+              className="flex items-center gap-2 border-slate-700 text-slate-300 hover:bg-slate-800 hover:border-slate-600 w-full sm:w-auto justify-center"
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Déconnexion</span>
+            </Button>
           </div>
         </div>
-      </header>
 
-      {/* Content Area */}
-      <div className="p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {stats.map((stat, index) => (
-            <Card key={index} className="stat-card border-0">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className={`text-sm font-medium ${stat.color}`}>{stat.title}</CardTitle>
-                <div className={`w-10 h-10 rounded-lg ${stat.bgColor} flex items-center justify-center`}>
-                  <stat.icon className={`w-5 h-5 ${stat.color}`} />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className={`text-3xl font-bold ${stat.color}`}>{stat.value}</div>
-                <p className="text-xs text-emerald-600 mt-1 flex items-center gap-1 font-medium">
-                  <ArrowUpRight className="w-3 h-3" />
-                  {stat.change} from last month
-                </p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Recent Homeworks and Statistics */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="bg-[#1a1f2e] border-slate-800">
-            <CardHeader>
-              <CardTitle className="text-white">Derniers Devoirs</CardTitle>
-              <CardDescription className="text-slate-400">Vos devoirs récemment créés</CardDescription>
+        {/* Quick Actions */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <Card 
+            className="hover:shadow-xl transition-all duration-300 cursor-pointer border-0 bg-gradient-to-br from-[#14b8a6] to-[#0d9488] active:scale-95 sm:hover:scale-105 group shadow-lg shadow-teal-500/20" 
+            onClick={() => router.push('/teacher/homework')}
+          >
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-xs sm:text-sm font-semibold text-white">Gestion des devoirs</CardTitle>
+              <div className="p-1.5 sm:p-2 bg-white/20 rounded-lg group-hover:bg-white/30 transition-colors backdrop-blur-sm flex-shrink-0">
+                <BookOpen className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
+              </div>
             </CardHeader>
             <CardContent>
+              <div className="text-2xl sm:text-3xl font-bold text-white">{allHomeworks.length}</div>
+              <p className="text-xs sm:text-sm text-teal-100">
+                Devoirs créés
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card 
+            className="hover:shadow-xl transition-all duration-300 cursor-pointer border-0 bg-gradient-to-br from-[#FF6B35] to-[#f97316] active:scale-95 sm:hover:scale-105 group shadow-lg shadow-orange-500/20" 
+            onClick={() => router.push('/teacher/submissions')}
+          >
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-xs sm:text-sm font-semibold text-white">Notation</CardTitle>
+              <div className="p-1.5 sm:p-2 bg-white/20 rounded-lg group-hover:bg-white/30 transition-colors backdrop-blur-sm flex-shrink-0">
+                <Star className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl sm:text-3xl font-bold text-white">{getPendingGradingCount()}</div>
+              <p className="text-xs sm:text-sm text-orange-100">
+                À noter
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-xl transition-all duration-300 cursor-pointer border-0 bg-gradient-to-br from-[#3b82f6] to-[#2563eb] active:scale-95 sm:hover:scale-105 group shadow-lg shadow-blue-500/20">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-xs sm:text-sm font-semibold text-white">Étudiants</CardTitle>
+              <div className="p-1.5 sm:p-2 bg-white/20 rounded-lg group-hover:bg-white/30 transition-colors backdrop-blur-sm flex-shrink-0">
+                <Users className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl sm:text-3xl font-bold text-white">{getTotalSubmissions()}</div>
+              <p className="text-xs sm:text-sm text-blue-100">
+                Soumissions reçues
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-xl transition-all duration-300 cursor-pointer border-0 bg-gradient-to-br from-[#a855f7] to-[#9333ea] active:scale-95 sm:hover:scale-105 group shadow-lg shadow-purple-500/20">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-xs sm:text-sm font-semibold text-white">Calendrier</CardTitle>
+              <div className="p-1.5 sm:p-2 bg-white/20 rounded-lg group-hover:bg-white/30 transition-colors backdrop-blur-sm flex-shrink-0">
+                <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl sm:text-3xl font-bold text-white">{getUpcomingDeadlines()}</div>
+              <p className="text-xs sm:text-sm text-purple-100">
+                Devoirs à venir
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Recent Homeworks */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+          <Card className="border border-slate-800 shadow-lg bg-slate-900/50 backdrop-blur-sm overflow-hidden">
+            <CardHeader className="bg-slate-800/50 border-b border-slate-700 p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0">
+                <div className="flex items-center space-x-2 sm:space-x-3">
+                  <div className="p-2 sm:p-2.5 bg-gradient-to-br from-[#14b8a6] to-[#3b82f6] rounded-lg flex-shrink-0">
+                    <BookOpen className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                  </div>
+                  <CardTitle className="text-white text-base sm:text-lg font-semibold">Derniers devoirs</CardTitle>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => router.push('/teacher/homework')}
+                  className="flex items-center gap-2 text-slate-300 hover:text-white hover:bg-slate-700/50 w-full sm:w-auto justify-center"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span>Nouveau</span>
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="p-4 sm:p-5">
               {isLoading ? (
-                <div className="flex items-center justify-center py-12">
-                  <Loader2 className="w-8 h-8 animate-spin text-[#a855f7]" />
+                <div className="flex justify-center items-center h-32">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#a855f7]"></div>
                 </div>
               ) : recentHomeworks.length === 0 ? (
-                <div className="text-center py-12 text-slate-400">
-                  <BookOpen className="w-16 h-16 mx-auto mb-4 opacity-50 text-[#a855f7]" />
-                  <p className="text-lg font-medium text-white">Aucun devoir créé</p>
-                  <p className="text-sm mt-2">Créez votre premier devoir pour commencer</p>
+                <div className="text-center py-8">
+                  <BookOpen className="h-12 w-12 text-slate-600 mx-auto mb-4" />
+                  <p className="text-slate-400">Aucun devoir créé</p>
+                  <Button 
+                    variant="outline" 
+                    className="mt-4 border-slate-700 text-slate-300 hover:bg-slate-800"
+                    onClick={() => router.push('/teacher/homework')}
+                  >
+                    Créer votre premier devoir
+                  </Button>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {recentHomeworks.map((homework) => (
-                    <div
-                      key={homework.id}
-                      className="border border-slate-700 rounded-lg p-4 hover:bg-[#0a0e1a]/50 transition-colors group bg-[#0a0e1a]/20"
-                    >
-                      <h4 className="font-semibold text-white group-hover:text-[#a855f7]">{homework.title}</h4>
-                      <p className="text-sm text-slate-400 mt-1 line-clamp-2">{homework.description}</p>
-                      <div className="flex justify-between items-center mt-3">
+                    <div key={homework.id} className="border border-slate-700/50 rounded-lg p-3 sm:p-4 hover:bg-slate-800/50 hover:border-[#14b8a6]/30 transition-all group cursor-pointer">
+                      <h4 className="font-semibold text-white group-hover:text-[#14b8a6] transition-colors text-sm sm:text-base">{homework.title}</h4>
+                      <p className="text-xs sm:text-sm text-slate-400 mt-1 line-clamp-2">{homework.description}</p>
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0 mt-3">
                         <span className="text-xs text-slate-500 flex items-center">
-                          <Calendar className="h-3 w-3 mr-1" />
-                          Échéance: {formatDate(homework.deadline)}
+                          <Calendar className="h-3 w-3 mr-1 flex-shrink-0" />
+                          <span className="truncate">Échéance: {formatDate(homework.deadline)}</span>
                         </span>
                         {homework.subject && (
-                          <span className="text-xs bg-[#a855f7]/30 text-[#c084fc] px-2 py-1 rounded-full font-medium border border-[#a855f7]/20">
+                          <span className="text-xs bg-[#14b8a6]/20 text-[#14b8a6] px-3 py-1 rounded-full font-medium border border-[#14b8a6]/30 w-fit">
                             {homework.subject}
                           </span>
                         )}
                       </div>
                     </div>
                   ))}
-                  <button
-                    onClick={() => router.push("/teacher/homework")}
-                    className="w-full border border-slate-700 text-slate-300 hover:bg-white/10 bg-transparent py-2 px-4 rounded-lg transition-colors"
+                  <Button 
+                    variant="ghost" 
+                    className="w-full text-slate-400 hover:text-white hover:bg-slate-800/50 mt-2"
+                    onClick={() => router.push('/teacher/homework')}
                   >
-                    Voir tous les devoirs
-                  </button>
+                    Voir tous les devoirs →
+                  </Button>
                 </div>
               )}
             </CardContent>
           </Card>
 
-          <Card className="bg-[#1a1f2e] border-slate-800">
-            <CardHeader>
-              <CardTitle className="text-white">Statistiques</CardTitle>
-              <CardDescription className="text-slate-400">Vue d'ensemble de vos activités</CardDescription>
+          <Card className="border border-slate-800 shadow-lg bg-slate-900/50 backdrop-blur-sm overflow-hidden">
+            <CardHeader className="bg-slate-800/50 border-b border-slate-700 p-4 sm:p-6">
+              <div className="flex items-center space-x-2 sm:space-x-3">
+                <div className="p-2 sm:p-2.5 bg-gradient-to-br from-[#a855f7] to-[#FF6B35] rounded-lg flex-shrink-0">
+                  <Users className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                </div>
+                <CardTitle className="text-white text-base sm:text-lg font-semibold">Statistiques</CardTitle>
+              </div>
             </CardHeader>
-            <CardContent className="p-6">
-              <div className="space-y-4">
-                <div className="flex justify-between items-center p-4 bg-[#0a0e1a]/30 rounded-lg border border-slate-700">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-[#a855f7]/20 rounded-lg">
-                      <BookOpen className="h-4 w-4 text-[#a855f7]" />
+            <CardContent className="p-4 sm:p-5">
+              <div className="space-y-3">
+                <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg border border-slate-700/50 hover:border-[#14b8a6]/30 transition-colors">
+                  <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+                    <div className="p-1.5 sm:p-2 bg-[#14b8a6]/10 rounded-lg flex-shrink-0">
+                      <BookOpen className="h-3 w-3 sm:h-4 sm:w-4 text-[#14b8a6]" />
                     </div>
-                    <span className="text-slate-300 font-medium">Total des devoirs</span>
+                    <span className="text-slate-300 font-medium text-xs sm:text-sm truncate">Total des devoirs</span>
                   </div>
-                  <span className="text-2xl font-bold text-[#a855f7]">{allHomeworks.length}</span>
+                  <span className="text-lg sm:text-xl font-bold text-[#14b8a6] ml-2">{allHomeworks.length}</span>
                 </div>
-                <div className="flex justify-between items-center p-4 bg-[#0a0e1a]/30 rounded-lg border border-slate-700">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-[#FF6B35]/20 rounded-lg">
-                      <FileText className="h-4 w-4 text-[#FF6B35]" />
+                <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg border border-slate-700/50 hover:border-blue-400/30 transition-colors">
+                  <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+                    <div className="p-1.5 sm:p-2 bg-blue-500/10 rounded-lg flex-shrink-0">
+                      <FileText className="h-3 w-3 sm:h-4 sm:w-4 text-blue-400" />
                     </div>
-                    <span className="text-slate-300 font-medium">Soumissions reçues</span>
+                    <span className="text-slate-300 font-medium text-xs sm:text-sm truncate">Soumissions reçues</span>
                   </div>
-                  <span className="text-2xl font-bold text-[#FF6B35]">{getTotalSubmissions()}</span>
+                  <span className="text-lg sm:text-xl font-bold text-blue-400 ml-2">{getTotalSubmissions()}</span>
                 </div>
-                <div className="flex justify-between items-center p-4 bg-[#0a0e1a]/30 rounded-lg border border-slate-700">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-emerald-500/20 rounded-lg">
-                      <CheckCircle className="h-4 w-4 text-emerald-400" />
+                <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg border border-slate-700/50 hover:border-green-400/30 transition-colors">
+                  <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+                    <div className="p-1.5 sm:p-2 bg-green-500/10 rounded-lg flex-shrink-0">
+                      <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-400" />
                     </div>
-                    <span className="text-slate-300 font-medium">Soumissions notées</span>
+                    <span className="text-slate-300 font-medium text-xs sm:text-sm truncate">Soumissions notées</span>
                   </div>
-                  <span className="text-2xl font-bold text-emerald-400">{getGradedCount()}</span>
+                  <span className="text-lg sm:text-xl font-bold text-green-400 ml-2">{getGradedCount()}</span>
                 </div>
-                <div className="flex justify-between items-center p-4 bg-[#0a0e1a]/30 rounded-lg border border-slate-700">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-[#FF6B35]/20 rounded-lg">
-                      <Star className="h-4 w-4 text-[#FF6B35]" />
+                <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg border border-slate-700/50 hover:border-yellow-400/30 transition-colors">
+                  <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+                    <div className="p-1.5 sm:p-2 bg-yellow-500/10 rounded-lg flex-shrink-0">
+                      <Star className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-400" />
                     </div>
-                    <span className="text-slate-300 font-medium">Moyenne des notes</span>
+                    <span className="text-slate-300 font-medium text-xs sm:text-sm truncate">Moyenne des notes</span>
                   </div>
-                  <span className="text-2xl font-bold text-[#FF6B35]">{getAverageGrade().toFixed(1)}/20</span>
+                  <span className="text-lg sm:text-xl font-bold text-yellow-400 ml-2">
+                    {getAverageGrade().toFixed(1)}/20
+                  </span>
                 </div>
-                <div className="flex justify-between items-center p-4 bg-[#0a0e1a]/30 rounded-lg border border-slate-700">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-red-500/20 rounded-lg">
-                      <AlertCircle className="h-4 w-4 text-red-400" />
+                <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg border border-slate-700/50 hover:border-red-400/30 transition-colors">
+                  <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+                    <div className="p-1.5 sm:p-2 bg-red-500/10 rounded-lg flex-shrink-0">
+                      <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 text-red-400" />
                     </div>
-                    <span className="text-slate-300 font-medium">Devoirs expirés</span>
+                    <span className="text-slate-300 font-medium text-xs sm:text-sm truncate">Devoirs expirés</span>
                   </div>
-                  <span className="text-2xl font-bold text-red-400">{getOverdueHomeworks()}</span>
+                  <span className="text-lg sm:text-xl font-bold text-red-400 ml-2">{getOverdueHomeworks()}</span>
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
       </div>
-
+      
       {/* Notifications */}
       {notifications.map((notification, index) => (
         <NotificationToast
@@ -327,6 +352,6 @@ export default function TeacherDashboard() {
           onClose={() => removeNotification(index)}
         />
       ))}
-    </>
+    </div>
   )
 }

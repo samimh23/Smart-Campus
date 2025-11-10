@@ -57,14 +57,13 @@ export default function TeacherSubmissionsPage() {
 
   const loadGrades = async () => {
     try {
-      // Charger les notes pour les soumissions affichées
-      const gradePromises = submissions.map(submission => 
-        submissionAPI.getMyGrades().then(grades => 
-          grades.find(grade => grade.submission_id === submission.id)
-        )
+      // Charger les notes données par l'enseignant
+      const allTeacherGrades = await submissionAPI.getTeacherGrades()
+      // Filtrer pour ne garder que les notes des soumissions affichées
+      const relevantGrades = allTeacherGrades.filter(grade =>
+        submissions.some(submission => submission.id === grade.submission_id)
       )
-      const gradeResults = await Promise.all(gradePromises)
-      setGrades(gradeResults.filter(grade => grade !== undefined) as Grade[])
+      setGrades(relevantGrades)
     } catch (error) {
       console.error('Erreur lors du chargement des notes:', error)
     }
@@ -130,7 +129,11 @@ export default function TeacherSubmissionsPage() {
           </div>
           <GradingForm
             submission={selectedSubmission}
-  initialData={editingGrade as any}
+            initialData={editingGrade ? {
+              grade: editingGrade.grade,
+              feedback: editingGrade.feedback,
+              is_final: editingGrade.is_final,
+            } : undefined}
             onSubmit={handleFormSubmit}
             onCancel={handleCancel}
             isEditing={!!editingGrade}
@@ -170,6 +173,12 @@ export default function TeacherSubmissionsPage() {
           grades={grades}
           onGrade={handleGrade}
           onEditGrade={handleEditGrade}
+          onRefresh={async () => {
+            if (selectedHomeworkId) {
+              await loadSubmissions(selectedHomeworkId)
+              await loadGrades()
+            }
+          }}
           isLoading={isLoading}
         />
       </div>

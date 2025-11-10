@@ -111,7 +111,14 @@ export default function TeacherHomeworkPage() {
             </Button>
           </div>
           <HomeworkForm
-  initialData={editingHomework as any}
+            initialData={editingHomework ? {
+              title: editingHomework.title,
+              description: editingHomework.description,
+              deadline: editingHomework.deadline,
+              subject: editingHomework.subject,
+              grade_level: editingHomework.grade_level,
+              attachment_url: (editingHomework as any).attachment_url,
+            } : undefined}
             onSubmit={handleFormSubmit}
             onCancel={handleCancel}
             isEditing={!!editingHomework}

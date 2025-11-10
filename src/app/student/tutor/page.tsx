@@ -536,42 +536,42 @@ export default function AiTutorWithBackend() {
     return (
       <>
         <OfflineIndicator />
-        <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-950">
+        <div className="min-h-screen bg-[#0a0e1a]">
         <div className="absolute inset-0 bg-grid-black/[0.02] dark:bg-grid-white/[0.02] bg-[size:50px_50px]" />
         
-        <div className="relative max-w-6xl mx-auto p-4 sm:p-6">
+        <div className="relative max-w-6xl mx-auto p-4 sm:p-6 pb-20 lg:pb-6">
           {/* Header */}
           <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
-            <div className="p-2 sm:p-3 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl sm:rounded-2xl shadow-lg">
+            <div className="p-2 sm:p-3 bg-gradient-to-br from-[#a855f7] to-[#FF6B35] rounded-xl sm:rounded-2xl shadow-lg">
               <Code className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">
+              <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-[#a855f7] to-[#FF6B35] bg-clip-text text-transparent">
                 AI Programming Tutor
               </h1>
-              <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">Welcome back, {user?.first_name || 'Student'}!</p>
+              <p className="text-sm sm:text-base text-slate-400">Welcome back, {user?.first_name || 'Student'}!</p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {/* Main Setup */}
-            <Card className="lg:col-span-2 border-0 shadow-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
-              <CardHeader className="pb-4">
-                <CardTitle className="flex items-center gap-3 text-xl sm:text-2xl dark:text-white">
-                  <div className="p-2 bg-indigo-100 dark:bg-indigo-900 rounded-lg">
-                    <Settings className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            <Card className="lg:col-span-2 bg-slate-900/50 border-slate-800 shadow-lg backdrop-blur-sm">
+              <CardHeader className="pb-4 bg-slate-800/50 border-b border-slate-700">
+                <CardTitle className="flex items-center gap-3 text-xl sm:text-2xl text-white">
+                  <div className="p-2 bg-[#a855f7]/20 rounded-lg border border-[#a855f7]/30">
+                    <Settings className="w-5 h-5 text-[#a855f7]" />
                   </div>
                   Configure Your Learning Session
                 </CardTitle>
-                <CardDescription className="text-sm sm:text-base dark:text-slate-400">
+                <CardDescription className="text-sm sm:text-base text-slate-400">
                   Set up your API key and choose your learning path
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6 sm:space-y-8">
                 {/* API Key Input */}
                 <div className="space-y-3">
-                  <Label htmlFor="apiKey" className="text-sm sm:text-base font-medium flex items-center gap-2 dark:text-slate-200">
-                    <div className="w-2 h-2 bg-indigo-500 dark:bg-indigo-400 rounded-full" />
+                  <Label htmlFor="apiKey" className="text-sm sm:text-base font-medium flex items-center gap-2 text-white">
+                    <div className="w-2 h-2 bg-[#a855f7] rounded-full" />
                     Gemini API Key
                   </Label>
                   <div className="flex gap-2">
@@ -581,27 +581,27 @@ export default function AiTutorWithBackend() {
                       placeholder="Enter your Gemini API key"
                       value={apiKey}
                       onChange={(e) => setApiKey(e.target.value)}
-                      className="h-10 sm:h-12 text-sm sm:text-base border-2 focus:border-indigo-500 dark:focus:border-indigo-400 transition-colors flex-1 dark:bg-slate-700 dark:border-slate-600 dark:text-white"
+                      className="h-10 sm:h-12 text-sm sm:text-base border-2 border-slate-700 focus:border-[#a855f7] transition-colors flex-1 bg-slate-800 text-white placeholder:text-slate-500"
                     />
                     <Button 
                       onClick={handleUpdateApiKey}
                       disabled={!apiKey || isLoading}
-                      variant="outline"
-                      className="px-3 sm:px-4 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
+                      variant="ghost"
+                      className="px-3 sm:px-4 border border-slate-700 text-slate-300 hover:bg-white/10 bg-transparent"
                     >
                       {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save'}
                     </Button>
                   </div>
-                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 flex items-center gap-2">
-                    <div className="w-1 h-1 bg-slate-400 dark:bg-slate-500 rounded-full" />
+                  <p className="text-xs sm:text-sm text-slate-400 flex items-center gap-2">
+                    <div className="w-1 h-1 bg-slate-500 rounded-full" />
                     Your API key is securely stored in your profile
                   </p>
                 </div>
 
                 {/* Language Grid */}
                 <div className="space-y-4">
-                  <Label className="text-sm sm:text-base font-medium flex items-center gap-2 dark:text-slate-200">
-                    <div className="w-2 h-2 bg-indigo-500 dark:bg-indigo-400 rounded-full" />
+                  <Label className="text-sm sm:text-base font-medium flex items-center gap-2 text-white">
+                    <div className="w-2 h-2 bg-[#a855f7] rounded-full" />
                     Programming Language
                   </Label>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -612,8 +612,8 @@ export default function AiTutorWithBackend() {
                         onClick={() => setSelectedLanguage(lang.value)}
                         className={`h-14 sm:h-16 flex flex-col items-center justify-center gap-1 sm:gap-2 transition-all hover:scale-105 ${
                           selectedLanguage === lang.value 
-                            ? 'bg-gradient-to-r from-indigo-500 to-purple-600 dark:from-indigo-600 dark:to-purple-700 border-0 shadow-lg text-white' 
-                            : `border-2 ${lang.color} dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-200 hover:border-indigo-400 dark:hover:border-indigo-500`
+                            ? 'bg-gradient-to-r from-[#a855f7] to-[#FF6B35] border-0 shadow-lg text-white' 
+                            : 'border-2 border-slate-700 bg-slate-800/50 text-slate-300 hover:border-[#a855f7]'
                         }`}
                       >
                         <span className="text-xl sm:text-2xl">{lang.icon}</span>
@@ -625,12 +625,12 @@ export default function AiTutorWithBackend() {
 
                 {/* Subject Selection */}
                 <div className="space-y-4">
-                  <Label className="text-sm sm:text-base font-medium flex items-center gap-2 dark:text-slate-200">
-                    <div className="w-2 h-2 bg-indigo-500 dark:bg-indigo-400 rounded-full" />
+                  <Label className="text-sm sm:text-base font-medium flex items-center gap-2 text-white">
+                    <div className="w-2 h-2 bg-[#a855f7] rounded-full" />
                     Learning Subject
                   </Label>
                   <Select value={selectedSubject} onValueChange={setSelectedSubject} disabled={!selectedLanguage}>
-                    <SelectTrigger className="h-10 sm:h-12 text-sm sm:text-base border-2 focus:border-indigo-500 dark:focus:border-indigo-400 dark:bg-slate-700 dark:border-slate-600 dark:text-white">
+                    <SelectTrigger className="h-10 sm:h-12 text-sm sm:text-base border-2 border-slate-700 focus:border-[#a855f7] bg-slate-800 text-white">
                       <SelectValue placeholder="Select a subject" />
                     </SelectTrigger>
                     <SelectContent>
@@ -647,7 +647,7 @@ export default function AiTutorWithBackend() {
                 <Button 
                   onClick={handleStartLearning}
                   disabled={!apiKey || !selectedLanguage || !selectedSubject || isGenerating}
-                  className="w-full h-12 sm:h-14 text-base sm:text-lg font-semibold bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 dark:from-indigo-600 dark:to-purple-700 dark:hover:from-indigo-700 dark:hover:to-purple-800 transition-all transform hover:scale-[1.02] shadow-lg text-white"
+                  className="w-full h-12 sm:h-14 text-base sm:text-lg font-semibold bg-gradient-to-r from-[#a855f7] to-[#FF6B35] hover:from-[#a855f7]/90 hover:to-[#FF6B35]/90 transition-all transform hover:scale-[1.02] shadow-lg text-white"
                 >
                   {isGenerating ? (
                     <>
@@ -774,29 +774,29 @@ export default function AiTutorWithBackend() {
                 </CardContent>
               </Card>
 
-              <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-3 text-lg">
-                    <User className="w-5 h-5 text-indigo-600" />
+              <Card className="border-0 shadow-xl bg-slate-900/50 backdrop-blur-sm border-slate-800">
+                <CardHeader className="bg-slate-800/50 border-b border-slate-700">
+                  <CardTitle className="flex items-center gap-3 text-lg text-white">
+                    <User className="w-5 h-5 text-[#a855f7]" />
                     Profile Info
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="text-sm">
-                    <div className="text-slate-500">Name</div>
-                    <div className="font-medium">{user?.first_name} {user?.last_name}</div>
+                    <div className="text-slate-400">Name</div>
+                    <div className="font-medium text-white">{user?.first_name} {user?.last_name}</div>
                   </div>
                   <div className="text-sm">
-                    <div className="text-slate-500">Email</div>
-                    <div className="font-medium">{user?.email}</div>
+                    <div className="text-slate-400">Email</div>
+                    <div className="font-medium text-white">{user?.email}</div>
                   </div>
                   <div className="text-sm">
-                    <div className="text-slate-500">API Key Status</div>
+                    <div className="text-slate-400">API Key Status</div>
                     <div className="font-medium">
                       {user?.geminiApiKey ? (
-                        <Badge variant="secondary" className="text-green-700 bg-green-100">Configured</Badge>
+                        <Badge variant="secondary" className="text-green-400 bg-green-500/20 border border-green-500/30">Configured</Badge>
                       ) : (
-                        <Badge variant="outline" className="text-orange-700 border-orange-300">Not Set</Badge>
+                        <Badge variant="outline" className="text-orange-400 border-orange-500/30 bg-orange-500/10">Not Set</Badge>
                       )}
                     </div>
                   </div>
@@ -814,35 +814,35 @@ export default function AiTutorWithBackend() {
   return (
     <>
       <OfflineIndicator />
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-950">
+      <div className="min-h-screen bg-[#0a0e1a]">
       <div className="absolute inset-0 bg-grid-black/[0.02] dark:bg-grid-white/[0.02] bg-[size:50px_50px]" />
       
-      <div className="relative max-w-7xl mx-auto p-3 sm:p-4 lg:p-6">
+      <div className="relative max-w-7xl mx-auto p-3 sm:p-4 lg:p-6 pb-20 lg:pb-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 lg:mb-8 gap-3 sm:gap-4">
           <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto">
             <Button 
-              variant="outline" 
+              variant="ghost"
               onClick={() => setCurrentView('setup')}
-              className="flex items-center gap-1.5 h-9 px-3 text-sm"
+              className="flex items-center gap-1.5 h-9 px-3 text-sm border border-slate-700 text-slate-300 hover:bg-white/10 bg-transparent"
             >
               <ChevronRight className="w-4 h-4 rotate-180" />
               <span className="hidden sm:inline">Back to Setup</span>
               <span className="sm:hidden">Back</span>
             </Button>
             <div className="flex-1 min-w-0">
-              <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-800 truncate">
+              <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-white truncate">
                 {currentLesson?.title || 'Smart Campus'}
               </h1>
-              <p className="text-xs sm:text-sm text-slate-600 truncate">
+              <p className="text-xs sm:text-sm text-slate-400 truncate">
                 {selectedLanguage} • {subjects[selectedLanguage as keyof typeof subjects]?.find(s => s.value === selectedSubject)?.label}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto justify-between sm:justify-end">
             <div className="text-left sm:text-right">
-              <div className="text-xs sm:text-sm text-slate-500">Success Rate</div>
-              <div className="font-bold text-sm sm:text-base">
+              <div className="text-xs sm:text-sm text-slate-400">Success Rate</div>
+              <div className="font-bold text-sm sm:text-base text-[#a855f7]">
                 {currentProgress.exercisesAttempted > 0 
                   ? `${Math.round((currentProgress.exercisesCorrect / currentProgress.exercisesAttempted) * 100)}%`
                   : '—'}
@@ -853,10 +853,10 @@ export default function AiTutorWithBackend() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
           {/* Lesson Content */}
-          <Card className="border-0 shadow-lg sm:shadow-xl bg-white/80 backdrop-blur-sm">
-            <CardHeader className="pb-3 sm:pb-6">
-              <CardTitle className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg">
-                <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600" />
+          <Card className="bg-slate-900/50 border-slate-800 shadow-lg backdrop-blur-sm">
+            <CardHeader className="pb-3 sm:pb-6 bg-slate-800/50 border-b border-slate-700">
+              <CardTitle className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg text-white">
+                <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-[#a855f7]" />
                 Lesson Content
               </CardTitle>
             </CardHeader>
@@ -932,10 +932,10 @@ export default function AiTutorWithBackend() {
                 </>
               ) : (
                 <div className="text-center py-12">
-                  <div className="w-20 h-20 mx-auto bg-slate-100 rounded-full flex items-center justify-center mb-4">
-                    <BookOpen className="w-10 h-10 text-slate-400" />
+                  <div className="w-20 h-20 mx-auto bg-slate-800/50 rounded-full flex items-center justify-center mb-4 border border-slate-700">
+                    <BookOpen className="w-10 h-10 text-slate-500" />
                   </div>
-                  <p className="text-slate-500 text-lg">No lesson loaded yet</p>
+                  <p className="text-slate-300 text-lg">No lesson loaded yet</p>
                   <p className="text-slate-400 text-sm mt-2">Generate a lesson to start learning!</p>
                 </div>
               )}
@@ -943,18 +943,19 @@ export default function AiTutorWithBackend() {
           </Card>
 
           {/* Exercise Section */}
-          <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
-            <CardHeader>
+          <Card className="bg-slate-900/50 border-slate-800 shadow-lg backdrop-blur-sm">
+            <CardHeader className="bg-slate-800/50 border-b border-slate-700">
               <div className="flex justify-between items-center">
-                <CardTitle className="flex items-center gap-3">
-                  <Code className="w-5 h-5 text-indigo-600" />
+                <CardTitle className="flex items-center gap-3 text-white">
+                  <Code className="w-5 h-5 text-[#a855f7]" />
                   Practice Exercise
                 </CardTitle>
                 <Button 
                   onClick={handleGenerateExercise}
                   disabled={isGenerating}
-                  variant="outline"
+                  variant="ghost"
                   size="sm"
+                  className="border border-slate-700 text-slate-300 hover:bg-white/10 bg-transparent"
                 >
                   {isGenerating ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -969,27 +970,27 @@ export default function AiTutorWithBackend() {
                 <>
                   <div className="mb-6">
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="p-2 bg-gradient-to-br from-orange-100 to-red-100 rounded-lg">
-                        <Target className="w-5 h-5 text-orange-600" />
+                      <div className="p-2 bg-gradient-to-br from-orange-500/20 to-red-500/20 rounded-lg border border-orange-500/30">
+                        <Target className="w-5 h-5 text-orange-400" />
                       </div>
-                      <h3 className="text-xl font-semibold text-slate-800">{currentExercise.title}</h3>
-                      <Badge variant="secondary" className="bg-orange-100 text-orange-700">
+                      <h3 className="text-xl font-semibold text-white">{currentExercise.title}</h3>
+                      <Badge variant="secondary" className="bg-orange-500/20 text-orange-400 border border-orange-500/30">
                         Challenge
                       </Badge>
                     </div>
-                    <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-6 border border-orange-100">
+                    <div className="bg-gradient-to-br from-orange-500/10 to-red-500/10 rounded-xl p-6 border border-orange-500/30">
                       <div className="flex items-center gap-2 mb-3">
-                        <Zap className="w-5 h-5 text-orange-500" />
-                        <span className="text-sm font-semibold text-orange-700 uppercase tracking-wide">Your Mission</span>
+                        <Zap className="w-5 h-5 text-orange-400" />
+                        <span className="text-sm font-semibold text-orange-400 uppercase tracking-wide">Your Mission</span>
                       </div>
-                      <p className="text-slate-700 leading-relaxed">{currentExercise.description}</p>
+                      <p className="text-slate-300 leading-relaxed">{currentExercise.description}</p>
                     </div>
                   </div>
 
                   <div className="mb-6">
-                    <Label htmlFor="codeEditor" className="text-base font-medium mb-3 flex items-center gap-2">
-                      <div className="p-1 bg-slate-100 rounded">
-                        <Code className="w-4 h-4 text-slate-600" />
+                    <Label htmlFor="codeEditor" className="text-base font-medium mb-3 flex items-center gap-2 text-white">
+                      <div className="p-1 bg-slate-800 rounded">
+                        <Code className="w-4 h-4 text-slate-400" />
                       </div>
                       Your Solution
                     </Label>
@@ -1030,7 +1031,7 @@ export default function AiTutorWithBackend() {
 
                   {/* Run Code Section */}
                   <div className="mb-4 space-y-3">
-                    <Label htmlFor="stdin" className="text-sm font-medium flex items-center gap-2">
+                    <Label htmlFor="stdin" className="text-sm font-medium flex items-center gap-2 text-white">
                       <Code className="w-3 h-3" />
                       Input (stdin)
                     </Label>
@@ -1039,14 +1040,14 @@ export default function AiTutorWithBackend() {
                       value={stdinInput}
                       onChange={(e) => setStdinInput(e.target.value)}
                       placeholder="Optional input for your program..."
-                      className="font-mono text-sm"
+                      className="font-mono text-sm bg-slate-800 border-slate-700 text-white placeholder:text-slate-500"
                     />
                     
                     <Button
                       onClick={handleRunCode}
                       disabled={!userCode || isRunning || isGenerating}
-                      variant="outline"
-                      className="w-full sm:w-auto"
+                      variant="ghost"
+                      className="w-full sm:w-auto border border-slate-700 text-slate-300 hover:bg-white/10 bg-transparent"
                     >
                       {isRunning ? (
                         <>
@@ -1062,14 +1063,14 @@ export default function AiTutorWithBackend() {
                     </Button>
 
                     {runOutput && (
-                      <div className="mt-3 border rounded-lg overflow-hidden">
-                        <div className="bg-slate-50 dark:bg-slate-900 p-3 border-b">
+                      <div className="mt-3 border border-slate-700 rounded-lg overflow-hidden">
+                        <div className="bg-slate-800/50 p-3 border-b border-slate-700">
                           <div className="flex items-center justify-between text-xs">
-                            <span className="font-medium">Output</span>
-                            <div className="flex gap-3 text-slate-600 dark:text-slate-400">
+                            <span className="font-medium text-white">Output</span>
+                            <div className="flex gap-3 text-slate-400">
                               {runOutput.time && <span>Time: {runOutput.time}s</span>}
                               {runOutput.memory && <span>Memory: {runOutput.memory} KB</span>}
-                              <span className={`font-medium ${runOutput.status?.id === 3 ? 'text-green-600' : 'text-orange-600'}`}>
+                              <span className={`font-medium ${runOutput.status?.id === 3 ? 'text-green-400' : 'text-orange-400'}`}>
                                 {runOutput.status?.description}
                               </span>
                             </div>
@@ -1106,7 +1107,7 @@ export default function AiTutorWithBackend() {
                     <Button 
                       onClick={handleSubmitSolution}
                       disabled={!userCode || isGenerating}
-                      className="flex-1 h-12 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 transition-all transform hover:scale-[1.02] shadow-lg"
+                      className="flex-1 h-12 bg-gradient-to-r from-[#a855f7] to-[#FF6B35] hover:from-[#a855f7]/90 hover:to-[#FF6B35]/90 transition-all transform hover:scale-[1.02] shadow-lg"
                     >
                       {isGenerating ? (
                         <>
@@ -1123,15 +1124,15 @@ export default function AiTutorWithBackend() {
                   </div>
 
                   {feedback && (
-                    <Alert className={feedback.isCorrect ? "border-green-200 bg-green-50" : "border-orange-200 bg-orange-50"}>
+                    <Alert className={feedback.isCorrect ? "border-green-500/30 bg-green-500/10" : "border-orange-500/30 bg-orange-500/10"}>
                       <div className="flex items-start gap-3">
                         {feedback.isCorrect ? (
-                          <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
+                          <CheckCircle className="w-5 h-5 text-green-400 mt-0.5" />
                         ) : (
-                          <XCircle className="w-5 h-5 text-orange-600 mt-0.5" />
+                          <XCircle className="w-5 h-5 text-orange-400 mt-0.5" />
                         )}
                         <div className="flex-1">
-                          <AlertDescription className={feedback.isCorrect ? "text-green-700" : "text-orange-700"}>
+                          <AlertDescription className={feedback.isCorrect ? "text-green-300" : "text-orange-300"}>
                             <div className="font-medium mb-2">{feedback.message}</div>
                             {feedback.suggestions.length > 0 && (
                               <div className="mt-3">

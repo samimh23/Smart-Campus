@@ -13,18 +13,21 @@ import {
   AlertCircle,
   FileText,
   Download,
-  Paperclip
+  Paperclip,
+  Sparkles
 } from 'lucide-react'
 import { HomeworkSubmission, Grade } from '@/types/homework'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { uploadAPI } from '@/lib/upload-api'
+import { aiGradingAPI } from '@/lib/ai-grading-api'
 
 interface SubmissionGradingListProps {
   submissions: HomeworkSubmission[]
   grades: Grade[]
   onGrade: (submission: HomeworkSubmission) => void
   onEditGrade: (grade: Grade) => void
+  onRefresh?: () => void
   isLoading?: boolean
 }
 
@@ -32,11 +35,35 @@ export function SubmissionGradingList({
   submissions, 
   grades, 
   onGrade, 
-  onEditGrade, 
+  onEditGrade,
+  onRefresh,
   isLoading 
 }: SubmissionGradingListProps) {
+  const [gradingSubmissionId, setGradingSubmissionId] = useState<number | null>(null)
+
   const getGradeForSubmission = (submissionId: number): Grade | undefined => {
     return grades.find(grade => grade.submission_id === submissionId)
+  }
+
+  const handleAutoGrade = async (submission: HomeworkSubmission) => {
+    if (!confirm('Voulez-vous noter ce devoir automatiquement avec l\'IA ?')) {
+      return
+    }
+
+    setGradingSubmissionId(submission.id)
+    try {
+      await aiGradingAPI.autoGradeSubmission(submission.id)
+      alert('✅ Le devoir a été noté automatiquement ! La note apparaîtra dans quelques secondes.')
+      // Rafraîchir la liste
+      if (onRefresh) {
+        setTimeout(() => onRefresh(), 1000)
+      }
+    } catch (error: any) {
+      console.error('Erreur lors de la notation automatique:', error)
+      alert('❌ Erreur : ' + error.message)
+    } finally {
+      setGradingSubmissionId(null)
+    }
   }
 
   const getStatusBadge = (submission: HomeworkSubmission) => {
@@ -157,10 +184,12 @@ export function SubmissionGradingList({
                             size="sm"
                             className="flex items-center gap-2"
                             onClick={() => {
-                              const fileUrl = submission.attachment_url.startsWith('http') 
-                                ? submission.attachment_url 
-                                : uploadAPI.getFileUrl(submission.attachment_url.replace('/uploads/', ''))
-                              window.open(fileUrl, '_blank')
+                              if (submission.attachment_url) {
+                                const fileUrl = submission.attachment_url.startsWith('http') 
+                                  ? submission.attachment_url 
+                                  : uploadAPI.getFileUrl(submission.attachment_url.replace('/uploads/', ''))
+                                window.open(fileUrl, '_blank')
+                              }
                             }}
                           >
                             <Download className="h-4 w-4" />
@@ -200,12 +229,32 @@ export function SubmissionGradingList({
                     </div>
                   )}
 
-                  <div className="flex justify-end">
+                  <div className="flex justify-end gap-2">
                     {submission.is_submitted && !grade && (
-                      <Button onClick={() => onGrade(submission)} className="flex items-center gap-2">
-                        <Star className="h-4 w-4" />
-                        Noter
-                      </Button>
+                      <>
+                        <Button 
+                          variant="outline"
+                          onClick={() => handleAutoGrade(submission)} 
+                          className="flex items-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600"
+                          disabled={gradingSubmissionId === submission.id}
+                        >
+                          {gradingSubmissionId === submission.id ? (
+                            <>
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                              Notation en cours...
+                            </>
+                          ) : (
+                            <>
+                              <Sparkles className="h-4 w-4" />
+                              Noter avec l'IA
+                            </>
+                          )}
+                        </Button>
+                        <Button onClick={() => onGrade(submission)} className="flex items-center gap-2">
+                          <Star className="h-4 w-4" />
+                          Noter manuellement
+                        </Button>
+                      </>
                     )}
                     {submission.is_submitted && grade && (
                       <Button 

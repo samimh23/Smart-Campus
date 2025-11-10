@@ -1,5 +1,4 @@
 export interface Homework {
-  due_date: any;
   id: number;
   title: string;
   description: string;
