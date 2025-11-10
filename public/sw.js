@@ -1,7 +1,7 @@
 // Simple PWA Service Worker for Smart Campus
-// Version 1.0.8 - Added backend endpoints for lessons/exercises!
+// Version 1.0.10 - Removed manifest from cache (now inlined in HTML)
 
-const CACHE = "smart-campus-cache-v9";
+const CACHE = "smart-campus-cache-v10";
 const ASSETS = [
   "/student/dashboard",
   "/student/courses",
@@ -18,8 +18,8 @@ const ASSETS = [
   "/student/explain",
   "/student/progress",
   "/auth",
-  "/offline.html",
-  "/manifest.webmanifest"
+  "/offline.html"
+  // manifest.webmanifest removed - now inlined in HTML head
 ];
 
 // Install event - cache static assets
@@ -95,7 +95,6 @@ self.addEventListener("fetch", (event) => {
           url.pathname.endsWith('.js') ||
           url.pathname.endsWith('.png') ||
           url.pathname.endsWith('.jpg') ||
-          url.pathname.endsWith('.webmanifest') ||
           shouldCacheAPI  // 🎯 Cache quiz/exam/tutor API responses for offline!
         ) {
           console.log("[SW] 💾 Caching:", request.url);
