@@ -108,17 +108,7 @@ export default function StudentCoursesPage() {
     
     console.log('🔍 Starting to load student data...')
     
-    // Test API connectivity first
-    const isAPIConnected = await testAPIConnectivity()
-    
-    if (!isAPIConnected) {
-      console.log('🔧 API not connected, using fallback data')
-      useFallbackData()
-      setIsLoading(false) // ADD THIS
-      return
-    }
-
-    // Try to load real data
+    // Try to load real data directly (no connectivity test needed with proxy)
     try {
       const [classData, subjectsData] = await Promise.all([
         loadStudentClass(userId).catch(error => {
@@ -186,11 +176,11 @@ const useFallbackData = () => {
   const loadStudentClass = async (userId: number): Promise<StudentClass | null> => {
     try {
       const token = localStorage.getItem('token')
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
 
       console.log(`🔄 Fetching class for student ${userId}...`)
       
-      const response = await fetch(`${API_URL}/classes/student/${userId}/class`, {
+      // Use Next.js API proxy
+      const response = await fetch(`/api/classes/student/${userId}/class`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -220,12 +210,11 @@ const useFallbackData = () => {
   const loadStudentSubjectsAndCourses = async (userId: number): Promise<Subject[]> => {
   try {
     const token = localStorage.getItem('token')
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
 
     console.log(`🔄 Fetching subjects for student ${userId}...`)
 
-    // 1. Get student's subjects
-    const subjectsResponse = await fetch(`${API_URL}/classes/student/${userId}/subjects`, {
+    // 1. Get student's subjects using proxy
+    const subjectsResponse = await fetch(`/api/classes/student/${userId}/subjects`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
@@ -255,7 +244,8 @@ const useFallbackData = () => {
     
     try {
       console.log(`🎯 Fetching student-specific courses for ${userId}...`)
-      const studentCoursesResponse = await fetch(`${API_URL}/courses/student/${userId}`, {
+      // Use proxy endpoint
+      const studentCoursesResponse = await fetch(`/api/courses/student/${userId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -278,8 +268,8 @@ const useFallbackData = () => {
         });
       } else {
         console.log('❌ Student courses endpoint failed, fetching all courses...')
-        // Fallback to all courses
-        const allCoursesResponse = await fetch(`${API_URL}/courses`, {
+        // Fallback to all courses using proxy
+        const allCoursesResponse = await fetch(`/api/courses`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -293,8 +283,8 @@ const useFallbackData = () => {
       }
     } catch (coursesError) {
       console.error('❌ Error loading courses:', coursesError)
-      // Fallback to all courses
-      const allCoursesResponse = await fetch(`${API_URL}/courses`, {
+      // Fallback to all courses using proxy
+      const allCoursesResponse = await fetch(`/api/courses`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

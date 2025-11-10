@@ -80,9 +80,11 @@ export default function TeacherCoursesPage() {
       setError(null)
       
       const token = localStorage.getItem('token')
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
       
-      const response = await fetch(`${API_URL}/courses`, {
+      console.log('🔍 Fetching courses via proxy')
+      
+      // Use Next.js API proxy to avoid CORS
+      const response = await fetch('/api/courses', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
