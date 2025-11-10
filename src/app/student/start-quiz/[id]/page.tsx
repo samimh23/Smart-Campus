@@ -91,10 +91,10 @@ export default function StartQuizPage() {
         wrong: wrongCount,
         time: timer,
       })
-      router.push('/dash/quiz')
+      router.push('/student/quiz')
     } catch (err) {
       console.error('Error submitting results', err)
-      router.push('/dash')
+      router.push('/student/dashboard')
     }
   }
 

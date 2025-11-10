@@ -56,7 +56,7 @@ export default function AddQuizPage() {
 
   const handleStartQuiz = () => {
     if (!quiz) return
-    router.push(`/dash/start-quiz/${quiz.id}`)
+    router.push(`/student/start-quiz/${quiz.id}`)
   }
 
   // helper

@@ -205,6 +205,14 @@ class ApiClient {
     return this.request('/tutor/streak');
   }
 
+  async getAllLessons(): Promise<ApiResponse<Lesson[]>> {
+    return this.request('/tutor/lessons');
+  }
+
+  async getAllExercises(): Promise<ApiResponse<Exercise[]>> {
+    return this.request('/tutor/exercises');
+  }
+
   async getSuccessRate(language?: string, timeRange?: string): Promise<ApiResponse<any>> {
     const params = new URLSearchParams();
     if (language) params.append('language', language);

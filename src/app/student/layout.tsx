@@ -11,7 +11,15 @@ import {
   LogOut,
   Menu,
   X,
-  GraduationCap
+  GraduationCap,
+  ClipboardList,
+  FileCheck,
+  Sparkles,
+  TrendingUp,
+  Lightbulb,
+  Brain,
+  Library,
+  Dumbbell
 } from 'lucide-react'
 
 export default function StudentLayout({
@@ -37,6 +45,15 @@ export default function StudentLayout({
     { name: 'Devoirs', href: '/student/homework', icon: FileText },
     { name: 'Soumissions', href: '/student/submissions', icon: Upload },
     { name: 'Notes', href: '/student/grades', icon: Star },
+    { name: 'Quiz', href: '/student/quiz', icon: ClipboardList },
+    { name: 'Ajouter Quiz', href: '/student/add-quizz', icon: ClipboardList },
+    { name: 'Examens', href: '/student/examen', icon: FileCheck },
+    // Learn with AI Section
+    { name: 'Generate Lesson', href: '/student/tutor', icon: Brain },
+    { name: 'My Lessons', href: '/student/my-lessons', icon: Library },
+    { name: 'My Exercises', href: '/student/my-exercises', icon: Dumbbell },
+    { name: 'AI Explain', href: '/student/explain', icon: Lightbulb },
+    { name: 'Progrès', href: '/student/progress', icon: TrendingUp },
   ]
 
   const isActive = (href: string) => pathname === href

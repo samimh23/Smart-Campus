@@ -87,7 +87,7 @@ function QuestionBox({ question }: any) {
 
   async function sendChat() {
     const newMessages = [...messages, { role: "user", content: chatMsg }];
-    const res = await axios.post("http://localhost:5000/exam/chat", {
+    const res = await axios.post("http://localhost:3000/exam/chat", {
       question: question.question,
       messages: newMessages,
     });

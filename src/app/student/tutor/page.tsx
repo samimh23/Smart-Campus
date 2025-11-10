@@ -168,6 +168,27 @@ export default function AiTutorWithBackend() {
     }
   }, [selectedLanguage, selectedSubject, isAuthenticated])
 
+  // Load cached lesson/exercise on mount
+  useEffect(() => {
+    const cachedLesson = localStorage.getItem('cached_lesson')
+    const cachedExercise = localStorage.getItem('cached_exercise')
+    const cachedLanguage = localStorage.getItem('cached_language')
+    const cachedSubject = localStorage.getItem('cached_subject')
+    
+    if (cachedLesson && cachedLanguage && cachedSubject) {
+      console.log('📦 Loading cached lesson from localStorage')
+      setCurrentLesson(JSON.parse(cachedLesson))
+      setSelectedLanguage(cachedLanguage)
+      setSelectedSubject(cachedSubject)
+      setCurrentView('learning')
+      
+      if (cachedExercise) {
+        console.log('📦 Loading cached exercise from localStorage')
+        setCurrentExercise(JSON.parse(cachedExercise))
+      }
+    }
+  }, [])
+
   // Check backend health on mount
   useEffect(() => {
     checkBackendHealth()
@@ -387,6 +408,10 @@ export default function AiTutorWithBackend() {
         setUserCode(response.data.starterCode)
         setFeedback(null)
         setOutput('')
+        
+        // Cache exercise to localStorage for offline access
+        localStorage.setItem('cached_exercise', JSON.stringify(response.data))
+        console.log('💾 Exercise cached to localStorage')
         
         // Reset generation state
         setTimeout(() => {

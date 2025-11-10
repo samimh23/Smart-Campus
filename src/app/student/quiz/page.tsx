@@ -32,10 +32,14 @@ export default function QuizListPage() {
   useEffect(() => {
     const fetchQuizzes = async () => {
       try {
+        console.log('🔍 Fetching quizzes...')
+        console.log('Token:', localStorage.getItem('token'))
+        console.log('Role:', localStorage.getItem('role'))
         const res = await apiService.get<Quiz>('/quiz')
+        console.log('✅ Quizzes received:', res)
         setQuizzes(res)
       } catch (error) {
-        console.error(error)
+        console.error('❌ Error fetching quizzes:', error)
       } finally {
         setLoading(false)
       }
@@ -127,7 +131,7 @@ export default function QuizListPage() {
                 <div className="mt-2">
                   <Button
                     className="w-full dark:text-white"
-                    onClick={() => router.push(`/dash/start-quiz/${quiz.id}`)}
+                    onClick={() => router.push(`/student/start-quiz/${quiz.id}`)}
                   >
                     Start Quiz
                   </Button>
