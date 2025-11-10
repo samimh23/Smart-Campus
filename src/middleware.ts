@@ -2,6 +2,25 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl
+
+  // Skip middleware for public static files
+  if (
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/static') ||
+    pathname.endsWith('.webmanifest') ||
+    pathname.endsWith('.js') ||
+    pathname.endsWith('.png') ||
+    pathname.endsWith('.jpg') ||
+    pathname.endsWith('.svg') ||
+    pathname.endsWith('.ico') ||
+    pathname === '/sw.js' ||
+    pathname === '/manifest.webmanifest' ||
+    pathname === '/favicon.ico'
+  ) {
+    return NextResponse.next()
+  }
+
   // Handle CORS for API routes
   const response = NextResponse.next()
 
@@ -27,7 +46,7 @@ export function middleware(request: NextRequest) {
   return response
 }
 
-// Apply middleware to API routes and other paths that need CORS
+// Apply middleware to API routes only
 export const config = {
   matcher: [
     '/api/:path*',
