@@ -1,0 +1,58 @@
+import { NextResponse } from 'next/server'
+
+export async function GET() {
+  const manifest = {
+    name: "Smart Campus",
+    short_name: "Smart Campus",
+    start_url: "/",
+    scope: "/",
+    description: "Task management and learning app",
+    orientation: "portrait",
+    display: "standalone",
+    background_color: "#0a0e1a",
+    theme_color: "#a855f7",
+    screenshots: [
+      {
+        src: "/ai.png",
+        sizes: "512x512",
+        type: "image/png",
+        form_factor: "wide",
+        label: "Smart Campus Dashboard"
+      },
+      {
+        src: "/ai.png",
+        sizes: "512x512",
+        type: "image/png",
+        label: "Smart Campus Learning"
+      }
+    ],
+    icons: [
+      {
+        src: "/ai.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "any"
+      },
+      {
+        src: "/ai.png",
+        sizes: "192x192",
+        type: "image/png",
+        purpose: "any"
+      },
+      {
+        src: "/ai.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "maskable"
+      }
+    ]
+  }
+
+  return new NextResponse(JSON.stringify(manifest), {
+    status: 200,
+    headers: {
+      'Content-Type': 'application/manifest+json',
+      'Cache-Control': 'public, max-age=3600',
+    },
+  })
+}

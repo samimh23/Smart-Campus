@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   description: "Plateforme intelligente de gestion éducative avec système de devoirs, dashboards et gestion des utilisateurs.",
   keywords: ["Smart Campus", "Éducation", "Gestion", "Devoirs", "Dashboard", "Enseignants", "Étudiants"],
   authors: [{ name: "Smart Campus Team" }],
-  manifest: "/manifest.webmanifest",
+  manifest: "/api/manifest",
   openGraph: {
     title: "Smart Campus",
     description: "Plateforme de gestion éducative intelligente",
@@ -46,7 +46,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="manifest" href="/manifest.webmanifest" />
+        <link rel="manifest" href="/api/manifest" />
         <meta name="theme-color" content="#a855f7" />
         <link rel="apple-touch-icon" href="/ai.png" />
       </head>
