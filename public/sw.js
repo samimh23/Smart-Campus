@@ -1,7 +1,7 @@
 // Simple PWA Service Worker for Smart Campus
 // Version 1.0.8 - Added backend endpoints for lessons/exercises!
 
-const CACHE = "smart-campus-cache-v8";
+const CACHE = "smart-campus-cache-v9";
 const ASSETS = [
   "/student/dashboard",
   "/student/courses",
