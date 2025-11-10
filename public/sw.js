@@ -63,19 +63,22 @@ self.addEventListener("fetch", (event) => {
   // Skip caching for chrome extensions
   if (request.url.startsWith("chrome-extension")) return;
   
-  // Check if this is a quiz/exam API request that we want to cache
-  const isQuizAPI = url.hostname === "localhost" && url.port === "3000" && 
-                    (url.pathname === "/quiz" || 
-                     url.pathname.startsWith("/quiz/") ||
-                     url.pathname === "/exam" ||
-                     url.pathname.startsWith("/exam/"));
-  
-  // Check if this is a tutor API request (lessons, exercises, progress)
-  const isTutorAPI = url.hostname === "localhost" && url.port === "3000" && 
-                     (url.pathname.startsWith("/tutor/"));
-  
-  // Combine both - cache quiz and tutor data
-  const shouldCacheAPI = isQuizAPI || isTutorAPI;
+  // Determine whether this request is an API call we should cache.
+  // Avoid hardcoding hostnames/ports (localhost); instead, cache same-origin API routes
+  const isSameOrigin = url.origin === self.location.origin;
+  const apiPathsToCache = [
+    "/api/quiz",
+    "/api/exam",
+    "/api/exams",
+    "/api/tutor",
+    "/api/lessons",
+    "/api/exercises",
+    "/api/progress",
+    "/api/courses"
+  ];
+
+  const isApiPath = isSameOrigin && url.pathname.startsWith("/api/");
+  const shouldCacheAPI = isApiPath && apiPathsToCache.some((p) => url.pathname.startsWith(p));
 
   // Network-first strategy: Try network, fallback to cache
   event.respondWith(
