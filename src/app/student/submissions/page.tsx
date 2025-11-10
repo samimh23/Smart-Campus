@@ -103,13 +103,13 @@ export default function StudentSubmissionsPage() {
 
   if (showForm && selectedHomeworkId) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div className="min-h-screen bg-[#0a0e1a] py-8">
         <div className="container mx-auto px-4">
           <div className="mb-6">
             <Button
-              variant="outline"
+              variant="ghost"
               onClick={handleCancel}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 border-slate-700 text-slate-300 hover:bg-white/10 bg-transparent"
             >
               <ArrowLeft className="h-4 w-4" />
               Retour aux soumissions
@@ -131,13 +131,13 @@ export default function StudentSubmissionsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-[#0a0e1a] py-8">
       <div className="container mx-auto px-4">
         <div className="mb-6">
           <Button
-            variant="outline"
+            variant="ghost"
             onClick={() => router.push('/student/dashboard')}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 border-slate-700 text-slate-300 hover:bg-white/10 bg-transparent"
           >
             <ArrowLeft className="h-4 w-4" />
             Retour au dashboard
@@ -145,7 +145,7 @@ export default function StudentSubmissionsPage() {
         </div>
 
         {error && (
-          <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+          <div className="mb-4 p-4 bg-red-900/50 border border-red-700 text-red-200 rounded">
             {error}
           </div>
         )}

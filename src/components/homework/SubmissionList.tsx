@@ -58,14 +58,14 @@ export function SubmissionList({
   const getStatusBadge = (submission: HomeworkSubmission) => {
     if (submission.is_submitted) {
       return (
-        <Badge variant={submission.is_late ? "destructive" : "default"} className="flex items-center gap-1">
+        <Badge variant={submission.is_late ? "destructive" : "default"} className={`flex items-center gap-1 ${!submission.is_late ? 'bg-[#a855f7] hover:bg-[#a855f7]/90' : ''}`}>
           <CheckCircle className="h-3 w-3" />
           {submission.is_late ? 'Soumis en retard' : 'Soumis'}
         </Badge>
       )
     }
     return (
-      <Badge variant="secondary" className="flex items-center gap-1">
+      <Badge className="flex items-center gap-1 bg-slate-700 text-slate-300">
         <Clock className="h-3 w-3" />
         Brouillon
       </Badge>
@@ -79,7 +79,7 @@ export function SubmissionList({
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-32">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#a855f7]"></div>
       </div>
     )
   }
@@ -87,19 +87,19 @@ export function SubmissionList({
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Mes soumissions</h2>
-        <Button onClick={onCreate} className="flex items-center gap-2">
+        <h2 className="text-2xl font-bold text-white">Mes soumissions</h2>
+        <Button onClick={onCreate} className="flex items-center gap-2 bg-[#a855f7] hover:bg-[#a855f7]/90">
           <Plus className="h-4 w-4" />
           Nouvelle soumission
         </Button>
       </div>
 
       {submissions.length === 0 ? (
-        <Card>
+        <Card className="bg-slate-900/50 border-slate-800">
           <CardContent className="flex flex-col items-center justify-center py-8">
-            <FileText className="h-12 w-12 text-gray-400 mb-4" />
-            <p className="text-gray-500">Aucune soumission pour le moment</p>
-            <Button onClick={onCreate} className="mt-4">
+            <FileText className="h-12 w-12 text-[#a855f7] opacity-50 mb-4" />
+            <p className="text-slate-400">Aucune soumission pour le moment</p>
+            <Button onClick={onCreate} className="mt-4 bg-[#a855f7] hover:bg-[#a855f7]/90">
               Créer votre première soumission
             </Button>
           </CardContent>
@@ -107,14 +107,14 @@ export function SubmissionList({
       ) : (
         <div className="grid gap-4">
           {submissions.map((submission) => (
-            <Card key={submission.id} className="hover:shadow-md transition-shadow">
+            <Card key={submission.id} className="bg-slate-900/50 border-slate-800 hover:border-[#a855f7] transition-all">
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <CardTitle className="text-lg">{submission.homework.title}</CardTitle>
+                    <CardTitle className="text-lg text-white">{submission.homework.title}</CardTitle>
                     <div className="flex items-center gap-2 mt-2">
-                      <User className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm text-gray-600">
+                      <User className="h-4 w-4 text-slate-400" />
+                      <span className="text-sm text-slate-400">
                         {submission.homework.teacher.first_name} {submission.homework.teacher.last_name}
                       </span>
                     </div>
@@ -123,17 +123,18 @@ export function SubmissionList({
                     {!submission.is_submitted && (
                       <>
                         <Button
-                          variant="outline"
+                          variant="ghost"
                           size="sm"
                           onClick={() => onEdit(submission)}
+                          className="border-slate-700 text-slate-300 hover:bg-white/10 bg-transparent"
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
                         <Button
-                          variant="outline"
+                          variant="ghost"
                           size="sm"
                           onClick={() => handleSubmit(submission.id)}
-                          className="text-green-600 hover:text-green-700"
+                          className="text-green-400 hover:text-green-300 border-slate-700 hover:bg-white/10 bg-transparent"
                         >
                           <CheckCircle className="h-4 w-4" />
                         </Button>
@@ -141,11 +142,11 @@ export function SubmissionList({
                     )}
                     {!submission.is_submitted && (
                       <Button
-                        variant="outline"
+                        variant="ghost"
                         size="sm"
                         onClick={() => handleDelete(submission.id)}
                         disabled={deletingId === submission.id}
-                        className="text-red-600 hover:text-red-700"
+                        className="text-red-400 hover:text-red-300 border-slate-700 hover:bg-white/10 bg-transparent"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -164,16 +165,16 @@ export function SubmissionList({
                   )}
                 </div>
 
-                <p className="text-gray-700 mb-4 line-clamp-3">{submission.content}</p>
+                <p className="text-slate-300 mb-4 line-clamp-3">{submission.content}</p>
                 
                 {submission.attachment_url && (
                   <div className="flex items-center gap-2 mb-4">
-                    <FileText className="h-4 w-4 text-gray-500" />
-                    <span className="text-sm text-gray-600">{submission.attachment_url}</span>
+                    <FileText className="h-4 w-4 text-slate-400" />
+                    <span className="text-sm text-slate-400">{submission.attachment_url}</span>
                   </div>
                 )}
 
-                <div className="flex items-center gap-2 text-sm text-gray-600">
+                <div className="flex items-center gap-2 text-sm text-slate-400">
                   <Calendar className="h-4 w-4" />
                   <span>
                     Échéance: {format(new Date(submission.homework.deadline), 'dd MMMM yyyy à HH:mm', { locale: fr })}

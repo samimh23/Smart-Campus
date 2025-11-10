@@ -141,20 +141,20 @@ export default function StudentHomeworkPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-[#0a0e1a] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#a855f7]"></div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-[#0a0e1a] py-8">
       <div className="container mx-auto px-4">
         <div className="mb-6">
           <Button
-            variant="outline"
+            variant="ghost"
             onClick={() => router.push('/student/dashboard')}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 border-slate-700 text-slate-300 hover:bg-white/10 bg-transparent"
           >
             <ArrowLeft className="h-4 w-4" />
             Retour au dashboard
@@ -162,12 +162,12 @@ export default function StudentHomeworkPage() {
         </div>
 
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Devoirs</h1>
-          <p className="text-gray-600">Consultez tous les devoirs assignés</p>
+          <h1 className="text-3xl font-bold text-white mb-2">Devoirs</h1>
+          <p className="text-slate-400">Consultez tous les devoirs assignés</p>
         </div>
 
         {error && (
-          <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+          <div className="mb-4 p-4 bg-red-900/50 border border-red-700 text-red-200 rounded">
             {error}
           </div>
         )}
@@ -176,9 +176,9 @@ export default function StudentHomeworkPage() {
           <div className="max-w-4xl mx-auto">
             <div className="mb-6">
               <Button
-                variant="outline"
+                variant="ghost"
                 onClick={handleCancelSubmission}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 border-slate-700 text-slate-300 hover:bg-white/10 bg-transparent"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Retour aux devoirs
@@ -196,11 +196,11 @@ export default function StudentHomeworkPage() {
             />
           </div>
         ) : homeworks.length === 0 ? (
-          <Card>
+          <Card className="bg-slate-900/50 border-slate-800">
             <CardContent className="flex flex-col items-center justify-center py-12">
-              <BookOpen className="h-16 w-16 text-gray-400 mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Aucun devoir disponible</h3>
-              <p className="text-gray-500 text-center">
+              <BookOpen className="h-16 w-16 text-[#a855f7] opacity-50 mb-4" />
+              <h3 className="text-lg font-medium text-white mb-2">Aucun devoir disponible</h3>
+              <p className="text-slate-400 text-center">
                 Il n'y a actuellement aucun devoir assigné. Vérifiez plus tard.
               </p>
             </CardContent>
@@ -215,14 +215,14 @@ export default function StudentHomeworkPage() {
               const grade = getGradeForHomework(homework.id)
 
               return (
-                <Card key={homework.id} className="hover:shadow-md transition-shadow">
+                <Card key={homework.id} className="bg-slate-900/50 border-slate-800 hover:border-[#a855f7] transition-all">
                   <CardHeader>
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
-                        <CardTitle className="text-xl">{homework.title}</CardTitle>
+                        <CardTitle className="text-xl text-white">{homework.title}</CardTitle>
                         <div className="flex items-center gap-2 mt-2">
-                          <User className="h-4 w-4 text-gray-500" />
-                          <span className="text-sm text-gray-600">
+                          <User className="h-4 w-4 text-slate-400" />
+                          <span className="text-sm text-slate-400">
                             {homework.teacher.first_name} {homework.teacher.last_name}
                           </span>
                         </div>
@@ -232,18 +232,18 @@ export default function StudentHomeworkPage() {
                           <Badge variant="destructive">En retard</Badge>
                         )}
                         {!isOverdueHomework && isDueSoonHomework && (
-                          <Badge variant="default">Bientôt dû</Badge>
+                          <Badge className="bg-[#FF6B35] hover:bg-[#FF6B35]/90">Bientôt dû</Badge>
                         )}
                         {!isOverdueHomework && !isDueSoonHomework && (
-                          <Badge variant="secondary">À venir</Badge>
+                          <Badge className="bg-slate-700 text-slate-300">À venir</Badge>
                         )}
                         {grade ? (
-                          <Badge variant="default" className="flex items-center gap-1">
+                          <Badge className="flex items-center gap-1 bg-[#a855f7] hover:bg-[#a855f7]/90">
                             <Star className="h-3 w-3" />
                             {grade.grade}/20
                           </Badge>
                         ) : submission && (
-                          <Badge variant={submission.is_submitted ? "default" : "outline"} className="flex items-center gap-1">
+                          <Badge variant={submission.is_submitted ? "default" : "outline"} className="flex items-center gap-1 bg-[#a855f7] hover:bg-[#a855f7]/90 border-slate-700">
                             {submission.is_submitted ? (
                               <>
                                 <CheckCircle className="h-3 w-3" />
@@ -261,28 +261,28 @@ export default function StudentHomeworkPage() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-gray-700 mb-4">{homework.description}</p>
+                    <p className="text-slate-300 mb-4">{homework.description}</p>
                     
                     <div className="flex flex-wrap gap-2 mb-4">
                       {homework.subject && (
-                        <Badge variant="secondary">{homework.subject}</Badge>
+                        <Badge className="bg-[#a855f7]/20 text-[#c084fc] border-[#a855f7]/30">{homework.subject}</Badge>
                       )}
                       {homework.grade_level && (
-                        <Badge variant="outline">{homework.grade_level}</Badge>
+                        <Badge className="bg-slate-700/50 text-slate-300 border-slate-600">{homework.grade_level}</Badge>
                       )}
                     </div>
 
                     {/* Afficher le fichier du devoir si disponible */}
                     {(homework as any).attachment_url && (
-                      <div className="mb-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
+                      <div className="mb-4 p-3 bg-[#a855f7]/10 border border-[#a855f7]/30 rounded-lg">
                         <div className="flex items-center gap-2">
-                          <Paperclip className="h-5 w-5 text-purple-600" />
-                          <span className="text-sm font-medium text-purple-800">Fichier du devoir attaché</span>
+                          <Paperclip className="h-5 w-5 text-[#a855f7]" />
+                          <span className="text-sm font-medium text-[#c084fc]">Fichier du devoir attaché</span>
                         </div>
                         <Button
-                          variant="outline"
+                          variant="ghost"
                           size="sm"
-                          className="mt-2 flex items-center gap-2"
+                          className="mt-2 flex items-center gap-2 border-slate-700 text-slate-300 hover:bg-white/10 bg-transparent"
                           onClick={() => {
                             const fileUrl = (homework as any).attachment_url.startsWith('http') 
                               ? (homework as any).attachment_url 
@@ -297,23 +297,23 @@ export default function StudentHomeworkPage() {
                     )}
 
                     {grade && (
-                      <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                      <div className="mb-4 p-4 bg-green-900/30 border border-green-700/50 rounded-lg">
                         <div className="flex items-center gap-2 mb-2">
-                          <Star className="h-5 w-5 text-green-600" />
-                          <span className="font-semibold text-green-800">Note reçue : {grade.grade}/20</span>
+                          <Star className="h-5 w-5 text-green-400" />
+                          <span className="font-semibold text-green-300">Note reçue : {grade.grade}/20</span>
                         </div>
                         {grade.feedback && (
-                          <p className="text-sm text-green-700">
+                          <p className="text-sm text-green-200">
                             <strong>Commentaire :</strong> {grade.feedback}
                           </p>
                         )}
-                        <p className="text-xs text-green-600 mt-2">
+                        <p className="text-xs text-green-400 mt-2">
                           Noté le: {new Date(grade.created_at).toLocaleDateString('fr-FR')}
                         </p>
                       </div>
                     )}
 
-                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
+                    <div className="flex items-center gap-2 text-sm text-slate-400 mb-4">
                       <Calendar className="h-4 w-4" />
                       <span>
                         Échéance: {formatDate(homework.deadline)}
@@ -330,7 +330,7 @@ export default function StudentHomeworkPage() {
                       {!submission ? (
                         <Button 
                           onClick={() => handleCreateSubmission(homework)}
-                          className="flex items-center gap-2"
+                          className="flex items-center gap-2 bg-[#a855f7] hover:bg-[#a855f7]/90"
                         >
                           <FileText className="h-4 w-4" />
                           Commencer le devoir
@@ -338,23 +338,23 @@ export default function StudentHomeworkPage() {
                       ) : !submission.is_submitted ? (
                         <div className="flex gap-2">
                           <Button 
-                            variant="outline"
+                            variant="ghost"
                             onClick={() => handleEditSubmission(homework)}
-                            className="flex items-center gap-2"
+                            className="flex items-center gap-2 border-slate-700 text-slate-300 hover:bg-white/10 bg-transparent"
                           >
                             <FileText className="h-4 w-4" />
                             Modifier
                           </Button>
                           <Button 
                             onClick={() => handleSubmitHomework(submission.id)}
-                            className="flex items-center gap-2"
+                            className="flex items-center gap-2 bg-[#a855f7] hover:bg-[#a855f7]/90"
                           >
                             <CheckCircle className="h-4 w-4" />
                             Soumettre
                           </Button>
                         </div>
                       ) : (
-                        <div className="flex items-center gap-2 text-green-600">
+                        <div className="flex items-center gap-2 text-green-400">
                           <CheckCircle className="h-4 w-4" />
                           <span className="text-sm font-medium">Devoir soumis</span>
                         </div>
